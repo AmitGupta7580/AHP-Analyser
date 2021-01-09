@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Only-For Devloper</title>
+  <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <button onclick="signout()">Signout</button>
+  <button onclick="info()">Info</button>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmHSD4qpxdjKY8wRkhbqUVvJ1lY8_aHt8",
+      authDomain: "adh-analyser.firebaseapp.com",
+      databaseURL: "https://adh-analyser-default-rtdb.firebaseio.com",
+      projectId: "adh-analyser",
+      storageBucket: "adh-analyser.appspot.com",
+      messagingSenderId: "1074482678407",
+      appId: "1:1074482678407:web:ee368e1e36fe4c4fcc0622",
+      measurementId: "G-L3RLFF3F17"
+    };
+    // Initialize Firebase
+
+    firebase.initializeApp(firebaseConfig);
+
+    function signout() {
+      firebase.auth().signOut().then(() => {
+        console.log("Signout succesfully");
+      }).catch((error) => {
+        console.log(error.message);
+      });
+    }
+    function info() {
+      if(firebase.auth().currentUser === null){
+        console.log("No user signed in");
+      }
+      else{
+        console.log(firebase.auth().currentUser.email);
+      }
+    }
+  </script>
+</body>
+</html>

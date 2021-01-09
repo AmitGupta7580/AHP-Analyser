@@ -1,0 +1,333 @@
+html body {
+  background-color: rgb(253, 255, 115);
+  overflow-y: hidden;
+}
+@-webkit-keyframes fadein {
+  from {bottom: 0; opacity: 0;} 
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {bottom: 30px; opacity: 1;} 
+  to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+input {
+  text-decoration: none;
+  border: none;
+}
+input:focus, textarea:focus, select:focus{
+  outline: none;
+}
+#login-body {
+  padding-left: 10vw;
+  padding-right: 10vw;
+  padding-top: 8vh;
+  padding-bottom: 8vh;
+  height: 85vh;
+  width: 100vw;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  display: inline-flex;
+}
+#sign-in-social-media {
+  padding-top: 12vh;
+  padding-left: 3vw;
+  width: 40vw;
+  text-align: center;
+}
+#sign-in-social-media-fb {
+  width: 30vw;
+  padding-top: 1.5vh;
+  background-color: #3B5998;
+  height: 9vh;
+  border-radius: 1vh;
+  opacity: 0.85;
+  font-size: x-large;
+  color: white;
+  cursor: pointer;
+}
+#sign-in-social-media-fb:hover {
+  opacity: 1;
+}
+#fb {
+  background-color: #3B5998;
+  text-decoration: none;
+  cursor: pointer;
+}
+#sign-in-social-media-twi {
+  width: 30vw;
+  padding-top: 1.5vh;
+  background-color: #55ACEE;
+  height: 9vh;
+  border-radius: 1vh;
+  opacity: 0.85;
+  font-size: x-large;
+  color: white;
+  cursor: pointer;
+}
+#sign-in-social-media-twi:hover {
+  opacity: 1;
+}
+#twitter {
+  background-color: #55ACEE;
+  text-decoration: none;
+  cursor: pointer;
+}
+#sign-in-social-media-goo {
+  width: 30vw;
+  padding-top: 1.5vh;
+  background-color: #dd4b39;
+  height: 9vh;
+  border-radius: 1vh;
+  opacity: 0.85;
+  font-size: x-large;
+  color: white;
+  cursor: pointer;
+}
+#sign-in-social-media-goo:hover {
+  opacity: 1;
+}
+#google {
+  background-color: #dd4b39;
+  cursor: pointer;
+  text-decoration: none;
+}
+.vl {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+  border: 2px solid #ddd;
+  height: 74vh;
+}
+.vl-innertext {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  padding: 8px 10px;
+}
+#sign-in-body {
+  padding-top: 7vh;
+  padding-left: 8vw;
+  width: 40vw;
+  text-align: center;
+  display: block;
+}
+#sign-in-email {
+  padding-left: 1vw;
+  padding-top: 0.5vw;
+  width: 25vw;
+  height: 8vh;
+  font-size: x-large;
+  background-color: white;
+}
+#sign-in-email-inp {
+  background-color: white;
+  color: gray;
+  width: 20vw;
+}
+#sign-in-password {
+  padding-left: 1vw;
+  padding-top: 0.5vw;
+  width: 25vw;
+  height: 8vh;
+  font-size: x-large;
+  background-color: white;
+}
+#sign-in-password-inp {
+  background-color: white;
+  color: gray;
+  width: 20vw;
+}
+#recaptcha {
+  margin-left: 1vw;
+  display: block;
+}
+#loginsubmit {    
+  visibility: hidden;
+}
+#sign-in-btn {
+  background-color: white;
+  margin-right: 7vw;
+  width: 15vw;
+  height: 7vh;
+  border: none;
+  color: white;
+  opacity: 0.85;
+  text-align: center;
+  font-size: x-large;
+  background-color: #45a049;
+}
+#sign-in-btn:hover {
+  opacity: 1;
+}
+#sign-in-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+#forget-password-red {
+  width: 25vw;
+  height: 4vh;
+  color: blue;
+}
+#sign-up {
+  width: 25vw;
+  height: 4vh;
+  color: blue;
+  cursor: pointer;
+}
+#sign-up-body {
+  padding-top: 7vh;
+  padding-left: 8vw;
+  width: 40vw;
+  text-align: center;
+  display: none;
+}
+#sign-up-username {
+  padding-left: 1vw;
+  padding-top: 0.5vw;
+  width: 25vw;
+  height: 8vh;
+  font-size: x-large;
+  background-color: white;
+}
+#sign-up-username-inp {
+  background-color: white;
+  color: gray;
+  width: 20vw;
+}
+#sign-up-email {
+  padding-left: 1vw;
+  padding-top: 0.5vw;
+  width: 25vw;
+  height: 8vh;
+  font-size: x-large;
+  background-color: white;
+}
+#sign-up-email-inp {
+  background-color: white;
+  color: gray;
+  width: 20vw;
+}
+#sign-up-password {
+  padding-left: 1vw;
+  padding-top: 0.5vw;
+  width: 25vw;
+  height: 8vh;
+  font-size: x-large;
+  background-color: white;
+}
+#sign-up-password-inp {
+  background-color: white;
+  color: gray;
+  width: 20vw;
+}
+#recaptcha {
+  margin-left: 1vw;
+}
+#sign-up-btn {
+  background-color: white;
+  margin-right: 7vw;
+  width: 15vw;
+  height: 7vh;
+  border: none;
+  color: white;
+  opacity: 0.85;
+  background-color: #45a049;
+}
+#sign-up-btn:hover {
+  opacity: 1;
+}
+#sign-in {
+  cursor: pointer;
+  width: 25vw;
+  height: 4vh;
+  color: blue;
+}
+#forget-password {
+  position: absolute;
+  margin-top: 20vh;
+  margin-left: 30vw;
+  width: 40vw;
+  height: 45vh;
+  background-color: rgb(178, 237, 252);
+  border-radius: 2vw;
+}
+#forget-password-email {
+  margin-left: 5vw;
+  margin-top: 10vh;
+  width: 30vw;
+  height: 8vh;
+  font-size: xx-large;
+}
+#forget-password-email-inp {
+  width: 30vw;
+  font-size: xx-large;
+  border-radius: 10px;
+  padding-left: 1vw;
+}
+#forget-password-smbt {
+  margin-left: 5vw;
+  margin-top: 10vh;
+  width: 30vw;
+  height: 8vh;
+}
+#forget-password-smbt-btn {
+  background-color: #62da68;
+  width: 30vw;
+  font-size: x-large;
+  border-radius: 10px;
+  padding-left: 1vw;
+}
+#forget-password-cls {
+  position: absolute;
+  margin-left: 92vw;
+  margin-top: 2vh;
+  width: 5vw;
+  height: 10vh;
+  font-size: xx-large;
+}
+#forget-password-cls-btn {
+  width: 5vw;
+  height: 10vh;
+  border-radius: 50%;
+  background-color: transparent;
+  color: black;
+  border: none;
+}
+#forget-password-cls-btn:hover {
+  background-color: rgb(247, 156, 129);
+  color: white;
+}
+.snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  bottom: 30px;
+  font-size: 17px;
+}
+.show {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
