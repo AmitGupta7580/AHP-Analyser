@@ -10,6 +10,13 @@ const PORT = 3000
 
 //Requiring Routes.
 const loginRouter = require('./routes/login')
+const homeRouter = require('./routes/home')
+const profileRouter = require('./routes/profile')
+const hierarchyRouter = require('./routes/hierarchy')
+const crthierarchyRouter = require('./routes/crthierarchy')
+const datasetRouter = require('./routes/dataset')
+const expertsRouter = require('./routes/experts')
+const aboutRouter = require('./routes/about')
 
 // Initializing app
 const app = express();
@@ -36,6 +43,13 @@ app.all("*", (req, res, next) => {
 
 // Telling express to use Routes
 app.use('/',loginRouter);
+app.use('/',homeRouter);
+app.use('/',profileRouter);
+app.use('/',hierarchyRouter);
+app.use('/',datasetRouter);
+app.use('/',crthierarchyRouter);
+app.use('/',expertsRouter);
+app.use('/',aboutRouter);
 
 app.listen(PORT, () => {
   console.log(`App listening at http://localhost:${PORT}`)

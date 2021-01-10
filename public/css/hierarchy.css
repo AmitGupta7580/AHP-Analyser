@@ -1,0 +1,25 @@
+#crt-hierarchy {
+  margin-top: 2.5vh;
+  margin-right: 3vw;
+  border: none;
+  border-radius: 5px;
+  background-color: rgb(122, 236, 46);
+  font-size: x-large;
+}
+.hierarchy-bx {
+  width: 18vw;
+  height: 36vh;
+  background-color: white;
+  margin-left: 3.5vw;
+  background-color: red;
+}
+.hierarchy-bx:hover {
+  background-color: white;
+}
+.hierarchy-row {
+  width: 90vw; 
+  margin-left: 5vw; 
+  margin-right: 5vw; 
+  margin-top: 5vh; 
+  display: inline-flex;
+}

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Hierarchy</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+
+  <link href="/static/css/styles.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/hierarchy.css" rel="stylesheet" type="text/css">
+  <% if(admin) { %>
+    <link href="/static/css/hierarchy_admin.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/Treant.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/tree.css" rel="stylesheet" type="text/css">
+  <% } %>
+</head>
+<body>
+  <!-- top navigation bar -->
+  <nav>
+    <div id="nav-bar">
+      <div id="project-Heading"><h2><b>ADH-Analyser</b></h2></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-1" href="./home"><i class="fas fa-home"></i>&nbsp;&nbsp;Home</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-2" style="color: rgb(255, 172, 40);" href="./hierarchy"><i class="fas fa-sitemap" style="color: rgb(255, 172, 40);"></i>&nbsp;&nbsp;Hierarchy</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-3" href="./dataset"><i class="fas fa-database"></i>&nbsp;&nbsp;Dataset</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-4" href="./experts"><i class="fas fa-user-tie"></i>&nbsp;&nbsp;Experts</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-5" href="./about"><i class="fas fa-info-circle"></i>&nbsp;&nbsp;About</a></div>
+      <% if(loggedin) { %>
+        <div style="font-size: xx-large; margin-left: 16vw; color: rgb(170, 127, 59);"><a id="nav-tab-login" href="/profile"><i class="fas fa-user-circle"></i></a></div>
+        <div style="font-size: x-large; margin-left: 3vw; color: rgb(170, 127, 59);"><button id="sign-out-btn" onclick="signout()"><i class="fas fa-sign-out-alt"></i></button></div>
+      <% } else { %>
+        <div style="font-size: large; margin-left: 20vw; color: rgb(170, 127, 59);"><a id="nav-tab-login" href="/login">Login&nbsp;&nbsp;<i class="fas fa-bars"></i></a></div>
+      <% } %>
+    </div>
+  </nav>
+  <!-- main content -->
+  <% if(admin) {%>
+    <span class="main">
+      <div id="hierarchy-body">
+        <div style="display: inline-flex; position: fixed;">
+          <div id="hierarchy-body-heading"><b>Hierarchy</b></div>
+          <button id="hierarchy-body-tree-btn" onclick="showTreeView()"><i class="fas fa-sitemap"></i></button>&nbsp;&nbsp;
+          <button id="hierarchy-body-add-btn" onclick="addCriteria()"><i class="fas fa-plus"></i></button>&nbsp;&nbsp;
+          <button id="hierarchy-body-sub-btn" onclick="delCriteria()"><i class="fas fa-minus"></i></button>
+        </div><br>
+        <div style="margin-top: 5vh; overflow-y: auto; overflow-x: auto; height: 75vh; width: 66vw;">
+          <ul>
+            <li id="crt-1">
+              <span class="caret">
+                <button class="hierarchy-body-node-btn"><i class="fas fa-angle-down" style="font-size: large;"></i></button>
+              </span>
+              <input class="hierarchy-body-node-inp" name="1" type="text" value="Criteria">
+              <ul class="nested active"></ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div id="alternative-body">
+        <div style="display: inline-flex; position: fixed;">
+          <div id="alternative-body-heading"><b>Alternatives</b></div><br>
+          <input id="alternative-body-cnt-alt" value="4" type="number" onchange="changeAltCnt(this.value)">
+        </div><br>
+        <div style="margin-top: 5vh; overflow-y: auto; overflow-x: auto; height: 67vh; width: vw;">
+          <ol id="alternative-body-list"></ul>
+        </div>
+        <div id="hierarchy-sv"><button id="hierarchy-sv-btn" onclick="saveHierarchy()">Save Hierarchy</button></div>
+      </div>
+    </span>
+    <span class="tree tree-toggle">
+      <div style="background-color: rgb(190, 243, 154); height: 82vh; width: 96vw; margin: 4vh; border-radius: 4vh; overflow: auto;">
+        <div style="position: fixed;">
+          <button id="tree-close-btn" onclick="closeTreeView()"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="tree-body"><div class="chart" id="Hierarchy-tree"></div></div>
+      </div>
+    </span>
+  <% } %>
+  <div id="sk-bar" class="snackbar"></div>
+
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/hierarchy.js"></script>
+  <% if(admin) { %>
+    <script src="/static/js/raphael.js"></script>
+    <script src="/static/js/Treant.js"></script>
+    <script src="/static/js/hierarchy_admin.js"></script>
+  <% } %>
+</body>
+</html>

@@ -26,22 +26,6 @@ router.get('/login', function(req, res) {
   });
 });
 
-router.get("/home", (req, res) => {
-  const sessionCookie = req.cookies.sessionID || "";
-  admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
-  .then((decodedClaims) => {
-    console.log(decodedClaims.uid);
-    console.log(decodedClaims.email);
-    console.log(decodedClaims.email_verified);
-    console.log(decodedClaims.expert);
-    res.render("home.ejs");
-  })
-  .catch((error) => {
-    console.log(error.message);
-    res.redirect("/login");
-  });
-});
-
 // end-points of authentication
 
 router.post("/sessionLogin", (req, res) => {

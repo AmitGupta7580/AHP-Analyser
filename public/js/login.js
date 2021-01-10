@@ -11,6 +11,9 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
+var db = firebase.firestore();
+var collection = db.collection("users");
+
 document.getElementById('registerform').addEventListener("submit", (event) => {
   event.preventDefault();
   const username = event.target.usernameSignup.value;
@@ -66,6 +69,12 @@ document.getElementById('registerform').addEventListener("submit", (event) => {
             showSnackbar();
           }, function(error) {
             console.log(error.message);
+          });
+        })
+        .then(() => {
+          collection.doc(firebase.auth().currentUser.uid).set({
+            Name : username,
+            Email : email
           });
         })
         .then(() => {

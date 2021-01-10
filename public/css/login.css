@@ -331,3 +331,13 @@ input:focus, textarea:focus, select:focus{
   -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
   animation: fadein 0.5s, fadeout 0.5s 2.5s;
 }
+#sign-out-btn {
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  color: white;
+}
+#sign-out-btn:hover {
+  background-color: white;
+  color: black;
+}

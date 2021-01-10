@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
-  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+  <title>Hierarchy</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -17,14 +17,15 @@
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
   <link href="/static/css/styles.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/hierarchy.css" rel="stylesheet" type="text/css">
 </head>
 <body>
   <!-- top navigation bar -->
   <nav>
     <div id="nav-bar">
       <div id="project-Heading"><h2><b>ADH-Analyser</b></h2></div>
-      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-1" style="color: rgb(255, 172, 40);" href="./home"><i class="fas fa-home" style="color: rgb(255, 172, 40);"></i>&nbsp;&nbsp;Home</a></div>
-      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-2" href="./hierarchy"><i class="fas fa-sitemap"></i>&nbsp;&nbsp;Hierarchy</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-1" href="./home"><i class="fas fa-home"></i>&nbsp;&nbsp;Home</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-2" style="color: rgb(255, 172, 40);" href="./hierarchy"><i class="fas fa-sitemap" style="color: rgb(255, 172, 40);"></i>&nbsp;&nbsp;Hierarchy</a></div>
       <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-3" href="./dataset"><i class="fas fa-database"></i>&nbsp;&nbsp;Dataset</a></div>
       <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-4" href="./experts"><i class="fas fa-user-tie"></i>&nbsp;&nbsp;Experts</a></div>
       <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-5" href="./about"><i class="fas fa-info-circle"></i>&nbsp;&nbsp;About</a></div>
@@ -37,11 +38,37 @@
     </div>
   </nav>
   <!-- main content -->
-  <div>
-    <h1>Home</h1>
-  </div>
+  <% if(admin) { %>
+    <div style="width: 100vw; height: 9vh; text-align: right; background-image: url(https://i.pinimg.com/originals/45/30/cb/4530cbae0d4f7862dd51541af5d35082.jpg);">
+      <button id="crt-hierarchy" onclick="createHierarchy()"><i class="fas fa-plus"></i>&nbsp;&nbsp;Create New Hierarchy</button>
+    </div>
+  <% } %>
+  <span class="">
+    <div style="width: 100vw; height: auto; background-image: url(https://i.pinimg.com/originals/45/30/cb/4530cbae0d4f7862dd51541af5d35082.jpg);">
+      <div class="hierarchy-row">
+        <div class="hierarchy-bx"></div>
+        <div class="hierarchy-bx"></div>
+        <div class="hierarchy-bx"></div>
+        <div class="hierarchy-bx"></div>
+      </div>
+      <div class="hierarchy-row">
+        <div class="hierarchy-bx"></div>
+        <div class="hierarchy-bx"></div>
+        <div class="hierarchy-bx"></div>
+        <div class="hierarchy-bx"></div>
+      </div>
+      <div class="hierarchy-row">
+        <div class="hierarchy-bx"></div>
+        <div class="hierarchy-bx"></div>
+        <div class="hierarchy-bx"></div>
+        <div class="hierarchy-bx"></div>
+      </div>
+    </div>
+  </span>
+  
   <div id="sk-bar" class="snackbar"></div>
 
   <script src="/static/js/app.js"></script>
+  <script src="/static/js/hierarchy.js"></script>
 </body>
 </html>
