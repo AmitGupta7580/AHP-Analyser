@@ -12,6 +12,7 @@
   <script src="https://www.google.com/recaptcha/api.js"></script>
 
   <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
@@ -67,10 +68,14 @@
       <div id="alternative-body">
         <div style="display: inline-flex; position: fixed;">
           <div id="alternative-body-heading"><b>Alternatives</b></div><br>
-          <input id="alternative-body-cnt-alt" value="4" type="number" onchange="changeAltCnt(this.value)">
+          <!-- <input id="alternative-body-cnt-alt" value="4" type="number" onchange="changeAltCnt(this.value)"> -->
+          <div style="height: 10vh; width: 3vw;">
+            <button id="alternative-body-cnt-btn-add" onclick="addAlt()"><i class="fas fa-plus"></i></button>
+            <button id="alternative-body-cnt-btn-sub" onclick="rmvAlt()"><i class="fas fa-minus"></i></button>
+          </div>
         </div><br>
-        <div style="margin-top: 5vh; overflow-y: auto; overflow-x: auto; height: 67vh; width: vw;">
-          <ol id="alternative-body-list"></ul>
+        <div style="margin-top: 8vh; overflow-y: auto; overflow-x: auto; height: 65vh;">
+          <ul id="alternative-body-list"></ul>
         </div>
         <div id="hierarchy-sv"><button id="hierarchy-sv-btn" onclick="saveHierarchy()">Save Hierarchy</button></div>
       </div>

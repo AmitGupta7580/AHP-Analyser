@@ -3,6 +3,7 @@ const path = require('path')
 var bodyParser = require('body-parser');
 const cookieParser = require("cookie-parser");
 const csrf = require("csurf");
+var { firebase, admin } = require('./firebase');
 
 const csrfMiddleware = csrf({ cookie: true });
 
@@ -51,6 +52,16 @@ app.use('/',crthierarchyRouter);
 app.use('/',expertsRouter);
 app.use('/',aboutRouter);
 
+// seting admin custom claims 
+var admin_uids = ["puinQ0wU9XgIChPOrGtZVPVL1oK2"];
+var uid;
+for(uid=0; uid<admin_uids.length; uid ++){
+  admin.auth().setCustomUserClaims(admin_uids[uid], {
+    user: true, 
+    expert: true,
+    admin: true
+  });
+}
 app.listen(PORT, () => {
   console.log(`App listening at http://localhost:${PORT}`)
 })

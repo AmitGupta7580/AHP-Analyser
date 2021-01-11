@@ -14,20 +14,14 @@ router.get('/login', function(req, res) {
   const sessionCookie = req.cookies.sessionID || "";
   admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
   .then((decodedClaims) => {
-    console.log(decodedClaims.uid);
-    console.log(decodedClaims.email);
-    console.log(decodedClaims.email_verified);
-    console.log(decodedClaims.expert);
     res.redirect('/home');
   })
   .catch((error) => {
-    console.log(error.message);
     res.render('login.ejs');
   });
 });
 
 // end-points of authentication
-
 router.post("/sessionLogin", (req, res) => {
   if(req.body.idToken === "" || req.body.idToken === undefined){
     res.status(401).send("UNAUTHORIZED REQUEST!");
@@ -35,17 +29,24 @@ router.post("/sessionLogin", (req, res) => {
   else{
     const idToken = req.body.idToken.toString();
     const expiresIn = 60 * 60 * 24 * 5 * 1000;
-    admin.auth().createSessionCookie(idToken, { expiresIn }).then( (sessionCookie) => {
-      const options = { maxAge: expiresIn, httpOnly: true };
-      res.cookie("sessionID", sessionCookie, options);
-      res.end(JSON.stringify({ status: "success" }));
-    },
-    (error) => {
-      console.log(error);
+    admin.auth().verifyIdToken(idToken).then((decodedToken) => {
+      const uid = decodedToken.uid;
+      console.log(uid);
+    })
+    .catch((error) => {
       res.status(401).send("UNAUTHORIZED REQUEST!");
-    });
+    })
+    .then(() => {
+      admin.auth().createSessionCookie(idToken, { expiresIn }).then( (sessionCookie) => {
+        const options = { maxAge: expiresIn, httpOnly: true };
+        res.cookie("sessionID", sessionCookie, options);
+        res.end(JSON.stringify({ status: "success" }));
+      },
+      (error) => {
+        res.status(401).send("UNAUTHORIZED REQUEST!");
+      });
+    })
   }
-  
 });
 
 router.get("/sessionLogout", (req, res) => {

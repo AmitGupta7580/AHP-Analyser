@@ -7,15 +7,16 @@ router.get("/crthierarchy", (req, res) => {
   const sessionCookie = req.cookies.sessionID || "";
   admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
   .then((decodedClaims) => {
-    if(true){ // decodedClaims.admin
-      res.render("crthierarchy.ejs",{loggedin: true, admin: true});
-    }
-    else{
-      res.redirect("/hierarchy");
-    }
+    admin.auth().getUser(decodedClaims.uid).then((userRecord) => {
+      if(userRecord.customClaims['admin']){ // decodedClaims.admin
+        res.render("crthierarchy.ejs",{loggedin: true, admin: true});
+      }
+      else{
+        res.redirect("/hierarchy");
+      }
+    });
   })
   .catch((error) => {
-    // res.render("crthierarchy.ejs",{loggedin: false, admin: true});
     res.redirect("/hierarchy");
   });
 });

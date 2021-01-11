@@ -63,7 +63,6 @@ document.getElementById('registerform').addEventListener("submit", (event) => {
         })
         .then(() => {
           firebase.auth().currentUser.sendEmailVerification().then(function() {
-            console.log("Be Happy");
             var sk = document.getElementById("sk-bar");
             sk.innerHTML = "Please Verify your Email";
             showSnackbar();
@@ -74,7 +73,8 @@ document.getElementById('registerform').addEventListener("submit", (event) => {
         .then(() => {
           collection.doc(firebase.auth().currentUser.uid).set({
             Name : username,
-            Email : email
+            Email : email,
+            Method : "Email"
           });
         })
         .then(() => {
@@ -144,34 +144,72 @@ document.getElementById('loginform').addEventListener("submit", (event) => {
           return false;
         })
         .then(({ user }) => {
-          if(firebase.auth().currentUser.emailVerified){
-            return user.getIdToken().then((idToken) => {
-              return fetch("/sessionLogin", {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                  "CSRF-Token": Cookies.get("XSRF-TOKEN"),
-                },
-                body: JSON.stringify({ idToken }),
+          firebase.auth().currentUser.getIdTokenResult().then((idTokenResult) => {
+            if (idTokenResult.claims.admin) {
+              console.log("admin account");
+              return user.getIdToken().then((idToken) => {
+                return fetch("/sessionLogin", {
+                  method: "POST",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+                  },
+                  body: JSON.stringify({ idToken }),
+                });
+              })
+              .catch((err) => {
+                grecaptcha.reset();
+                var sk = document.getElementById("sk-bar");
+                sk.innerHTML = "Error Accured";
+                showSnackbar();
+                return false;
               });
-            });
-          }
-          else{
+            }
+            else {
+              if(user.emailVerified){
+                return user.getIdToken().then((idToken) => {
+                  return fetch("/sessionLogin", {
+                    method: "POST",
+                    headers: {
+                      Accept: "application/json",
+                      "Content-Type": "application/json",
+                      "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+                    },
+                    body: JSON.stringify({ idToken }),
+                  });
+                })
+                .catch((err) => {
+                  grecaptcha.reset();
+                  var sk = document.getElementById("sk-bar");
+                  sk.innerHTML = "Error Accured";
+                  showSnackbar();
+                  return false;
+                });
+              }
+              else{
+                grecaptcha.reset();
+                var sk = document.getElementById("sk-bar");
+                sk.innerHTML = "Please Verify your email";
+                showSnackbar();
+                return false;
+              }
+            }
+          })
+          .catch((error) => {
             grecaptcha.reset();
             var sk = document.getElementById("sk-bar");
-            sk.innerHTML = "Please Verify your email";
+            sk.innerHTML = "Error accured";
             showSnackbar();
             return false;
-          }
-        })
-        .then(() => {
-          return firebase.auth().signOut();
-        })
-        .then(() => {
-          window.location.assign("/home");
+          })
+          .then(() => {
+            return firebase.auth().signOut();
+          })
+          .then((val) => {
+            window.location.assign("/home");
+          });
         });
-        return false;
       }
     });
   }
@@ -187,7 +225,12 @@ function googleSignin() {
   })
   .then((result) => {
     /** @type {firebase.auth.OAuthCredential} */
-    return firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
+    collection.doc(firebase.auth().currentUser.uid).set({
+      Name : result.user.displayName,
+      Email : result.user.email,
+      Method : "google"
+    });
+    return firebase.auth().currentUser.getIdToken(true).then((idToken) => {
       return fetch("/sessionLogin", {
         method: "POST",
         headers: {
@@ -221,6 +264,11 @@ function facebookSignin() {
   })
   .then((result) => {
     /** @type {firebase.auth.OAuthCredential} */
+    collection.doc(firebase.auth().currentUser.uid).set({
+      Name : result.user.displayName,
+      Email : result.user.email,
+      Method : "facebook"
+    });
     return firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
       return fetch("/sessionLogin", {
         method: "POST",
@@ -255,6 +303,11 @@ function twitterSignin() {
   })
   .then((result) => {
     /** @type {firebase.auth.OAuthCredential} */
+    collection.doc(firebase.auth().currentUser.uid).set({
+      Name : result.user.displayName,
+      Email : result.user.email,
+      Method : "twitter"
+    });
     return firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
       return fetch("/sessionLogin", {
         method: "POST",

@@ -1,4 +1,3 @@
-/*  Main   */
 .main {
   display: inline-flex;
 }
@@ -86,7 +85,6 @@
 }
 #alternative-body {
   padding-top: 2vh;
-  padding-left: 2vw;
   height: 90vh;
   width: 30vw;
   border-top: 1vh solid rgb(193, 194, 133);
@@ -99,16 +97,18 @@
   font-size: xx-large;
   text-align: center;
   color: green;
-  width: 23vw;
+  width: 25vw;
 }
-#alternative-body-cnt-alt {
-  margin-top: 1vh;
-  width: 3vw;
-  height: 5vh;
+#alternative-body-cnt-btn-add {
   border: none;
-  background-color: rgb(103, 230, 141);
-  border-radius: 1vw;
-  padding-left: 0.7vw;
+  background-color: rgb(49, 207, 255);
+  color: white;
+  border-bottom: 1px black solid;
+}
+#alternative-body-cnt-btn-sub {
+  border: none;
+  background-color: rgb(255, 56, 56);
+  color: white;
 }
 .alternative-body-node-inp {
   background-color: rgb(138, 138, 196);
