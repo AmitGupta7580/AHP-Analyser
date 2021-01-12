@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hierarchy</title>
+  <title>Hierarchy-View</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <script src="https://kit.fontawesome.com/a076d05399.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -12,12 +12,13 @@
   <script src="https://www.google.com/recaptcha/api.js"></script>
 
   <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
   <link href="/static/css/styles.css" rel="stylesheet" type="text/css">
-  <link href="/static/css/hierarchy.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/tree.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/Treant.css" rel="stylesheet" type="text/css">
 </head>
 <body>
   <!-- top navigation bar -->
@@ -38,19 +39,16 @@
     </div>
   </nav>
   <!-- main content -->
-  <% if(admin) { %>
-    <div style="width: 100vw; height: 9vh; text-align: right; background-image: url(https://i.pinimg.com/originals/45/30/cb/4530cbae0d4f7862dd51541af5d35082.jpg);">
-      <button id="crt-hierarchy" onclick="createHierarchy()"><i class="fas fa-plus"></i>&nbsp;&nbsp;Create New Hierarchy</button>
+  <div style="background-image: url(https://i.pinimg.com/originals/45/30/cb/4530cbae0d4f7862dd51541af5d35082.jpg); width: 100vw; height: 90vh; overflow: hidden;">
+    <div style="position: absolute; ;background-color: rgb(190, 243, 154); height: 82vh; width: 96vw; margin: 4vh; border-radius: 4vh; overflow: auto;">
+      <div id="tree-body"><div class="chart" id="Hierarchy-tree"></div></div>
     </div>
-    <div id="hierarchy-lst" style="height: 81vh;" >
-  <% } else { %>
-    <div id="hierarchy-lst" style="height: 90vh;" >
-  <% } %>
-    </div>
-  
+  </div>
   <div id="sk-bar" class="snackbar"></div>
 
   <script src="/static/js/app.js"></script>
-  <script src="/static/js/hierarchy.js"></script>
+  <script src="/static/js/raphael.js"></script>
+  <script src="/static/js/Treant.js"></script>
+  <script src="/static/js/hierarchy_view.js"></script>
 </body>
 </html>

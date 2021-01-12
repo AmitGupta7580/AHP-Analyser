@@ -1,7 +1,7 @@
 require("firebase/auth");
 var firebase = require('firebase')
 var admin = require('firebase-admin')
-var serviceAccount = require("F:\\Web Dev\\AHP-Server\\service-account.json");
+var serviceAccount = require("F:\\Web Dev\\AHP-Server2\\service-account.json");
 
 var firebaseConfig = {
   apiKey: "AIzaSyAmHSD4qpxdjKY8wRkhbqUVvJ1lY8_aHt8",

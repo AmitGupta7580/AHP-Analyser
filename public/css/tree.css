@@ -8,11 +8,16 @@
   background-color: rgb(138, 138, 196); 
   color: white;  
   border-radius: 3px; 
-  width: 5vw; 
-  height: 5vh;
+  width: auto; 
+  height: auto;
+  padding: 5px;
 }
 .Treant > p { 
   font-size: larger; 
   height: 20px; 
   font-weight: bold; 
+}
+#tree-body {
+  height: 80vh; 
+  width: 87vw;
 }

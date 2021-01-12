@@ -1,13 +1,3 @@
-class Hierarchy {
-  constructor(id, goal, levels, alt_cnt, alternatives){
-    this.id = id;
-    this.goal = goal;
-    this.levels = levels;
-    this.alt_cnt = alt_cnt;
-    this.alternatives = alternatives;
-  }
-}
-
 const firebaseConfig = {
   apiKey: "AIzaSyAmHSD4qpxdjKY8wRkhbqUVvJ1lY8_aHt8",
   authDomain: "adh-analyser.firebaseapp.com",
@@ -31,9 +21,7 @@ console.log(random_color);
 hierarchy_collection.get().then((querySnapshot) => {
   var hierarchy_data = new Array();
   querySnapshot.forEach((doc) => {
-    var data = doc.data();
-    var h = new Hierarchy(data.id, data.goal, data.level, data.alt_cnt, data.alternative);
-    hierarchy_data.push(h);
+    hierarchy_data.push([doc.id, doc.data()]);
   })
   console.log(hierarchy_data.length);
   var i;
@@ -44,9 +32,10 @@ hierarchy_collection.get().then((querySnapshot) => {
     var j = 0;
     while(((i+j)<hierarchy_data.length) && (j<4)){
       // information
-      var goal = document.createTextNode(hierarchy_data[i+j].goal);
-      var no_lvl = document.createTextNode(hierarchy_data[i+j].levels + " Levels");
-      var no_alt = document.createTextNode(hierarchy_data[i+j].alt_cnt + " Alternatives");
+      var goal = document.createTextNode(hierarchy_data[i+j][1].goal);
+      var no_lvl = document.createTextNode(hierarchy_data[i+j][1].level + " Levels");
+      var no_alt = document.createTextNode(hierarchy_data[i+j][1].alt_cnt + " Alternatives");
+      var id = hierarchy_data[i+j][0];
 
       // create elements
       var br = document.createElement("BR");
@@ -73,12 +62,12 @@ hierarchy_collection.get().then((querySnapshot) => {
       
       // adding Event Listeners
       bt1.addEventListener('click', (event) => {
-        var id = event.path[2].id;
-        window.location.assign('/dataset/fill?id='+hierarchy_data[id].id);
+        console.log("Edit : " + i+j);
+        console.log("ID : " + id);
       });
       bt2.addEventListener('click', (event) => {
-        var id = event.path[2].id;
-        window.location.assign('/hierarchy/view?id='+hierarchy_data[id].id);
+        console.log("View : " + i+j);
+        console.log("ID : " + id);
       });
 
       // appending childs
@@ -112,7 +101,3 @@ hierarchy_collection.get().then((querySnapshot) => {
   </div>
 </div>
 */
-
-function createHierarchy() {
-  window.location.assign("/crthierarchy");
-}
