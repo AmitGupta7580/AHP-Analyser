@@ -12,13 +12,15 @@
   <script src="https://www.google.com/recaptcha/api.js"></script>
 
   <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+  <link href="https://unpkg.com/tabulator-tables@4.9.3/dist/css/tabulator.min.css" rel="stylesheet">
+  <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.9.3/dist/js/tabulator.min.js"></script>
 
   <link href="/static/css/styles.css" rel="stylesheet" type="text/css">
-  <link href="/static/css/enter_data.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/hierarchy_admin.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/Treant.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/tree.css" rel="stylesheet" type="text/css">
 </head>
 <body>
   <!-- top navigation bar -->
@@ -39,10 +41,53 @@
     </div>
   </nav>
   <!-- main content -->
+  <span class="main">
+    <div id="hierarchy-body">
+      <div style="display: inline-flex; position: fixed;">
+        <div id="hierarchy-body-heading"><b>Hierarchy</b></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </div><br>
+      <div style="margin-top: 5vh; overflow-y: auto; overflow-x: auto; height: 75vh; width: 66vw;">
+        <ul id="hierarchy-view-list">
+        </ul>
+      </div>
+    </div>
+    <div id="alternative-body">
+      <div style="display: inline-flex; position: fixed;">
+        <div id="alternative-body-heading"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alternatives</b></div><br>
+      </div><br>
+      <div style="margin-top: 8vh; overflow-y: auto; overflow-x: auto; height: 56vh;">
+        <ul id="alternative-body-list"></ul>
+      </div>
+      <div id="hierarchy-sv"><button id="hierarchy-sv-btn" onclick="saveHierarchy()">Save Dataset To Cloud</button></div>
+      <div id="hierarchy-sv"><button id="hierarchy-sv-btn" disabled onclick="saveHierarchy()">Compute Result</button></div>
+    </div>
+  </span>
+  <span class="tree tree-toggle">
+    <div style="background-color: rgb(190, 243, 154); height: 82vh; width: 96vw; margin: 4vh; border-radius: 4vh; overflow: auto;">
+      <div style="position: fixed;">
+        <button id="tree-close-btn" onclick="closeTreeView()"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="tree-body"><div class="chart" id="Hierarchy-tree"></div></div>
+    </div>
+  </span>
+  <span class="datatable table-toggle">
+    <div id="table-main">
+      <div style="display: inline-flex; height: 10vh;">
+        <div id="table-alt-heading"><b>Pairwise-Comparision between Alternatives W.R.T Salary</w></b></div>
+        <button id="table-save-btn" onclick="saveTable()"><i class="fas fa-save"></i></button>
+        <button id="table-close-btn" onclick="closeTable()"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="table-body">
+        <div id="table-really"></div>
+      </div>
+    </div>
+  </span>
 
   <div id="sk-bar" class="snackbar"></div>
 
   <script src="/static/js/app.js"></script>
   <script src="/static/js/enter_data.js"></script>
+  <script src="/static/js/raphael.js"></script>
+  <script src="/static/js/Treant.js"></script>
 </body>
 </html>

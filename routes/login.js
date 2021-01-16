@@ -1,6 +1,8 @@
-var express = require('express');
+const express = require('express');
+const mongoose = require('mongoose');
 var { firebase, admin } = require('../firebase');
 
+const UserModel = mongoose.model('User');
 var router = express.Router();
 const request = require('request');
 
@@ -22,6 +24,51 @@ router.get('/login', function(req, res) {
 });
 
 // end-points of authentication
+router.post("/registerUser", (req, res) => {
+  console.log("UNew User requested to register");
+  var uname = req.body.username;
+  var email = req.body.email;
+  var provider = req.body.provider;
+
+  admin.auth().getUserByEmail(email).then((userRecord) => {
+    var uid = userRecord.uid;
+    var User = new UserModel();
+    User.uuid = uid;
+    User.username = uname;
+    User.email = email;
+    User.provider = provider;
+    User.admin = false;
+    User.save((err, doc) => {
+      if(!err){
+        console.log("User Registered");
+        res.send("user registered");
+      }
+      else{
+        console.log(err);
+        res.status(401).send("UNAUTHORIZED REQUEST!");
+      }
+    });
+  })
+  .catch((err) => {
+    var User = new UserModel();
+    User.uuid = null;
+    User.username = uname;
+    User.email = null;
+    User.provider = provider;
+    User.admin = false;
+    User.save((err, doc) => {
+      if(!err){
+        console.log("User Registered");
+        res.send("user registered");
+      }
+      else{
+        console.log(err);
+        res.status(401).send("UNAUTHORIZED REQUEST!");
+      }
+    });
+  });
+});
+
 router.post("/sessionLogin", (req, res) => {
   if(req.body.idToken === "" || req.body.idToken === undefined){
     res.status(401).send("UNAUTHORIZED REQUEST!");

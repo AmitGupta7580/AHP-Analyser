@@ -30,7 +30,13 @@
   width: 18vw;
   text-align: left;
 }
-.hierarchy-btn {
+.hierarchy-btn-edit {
+  border: none;
+  font-size: larger;
+  border-radius: 50%;
+  margin-left: 4.3vw;
+}
+.hierarchy-btn-view {
   border: none;
   font-size: larger;
   border-radius: 50%;

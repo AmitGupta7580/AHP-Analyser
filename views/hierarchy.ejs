@@ -46,6 +46,20 @@
   <% } else { %>
     <div id="hierarchy-lst" style="height: 90vh;" >
   <% } %>
+  <% for(var i=0; i<data.length; i+=4){ %>
+    <div class="hierarchy-row">
+      <% for(var j=0; j<4&&(i+j)<data.length; j++) { %>
+        <div class="hierarchy-bx">
+          <h2 style="margin-top: 2vh;"><%= data[i+j].goal %></h2>
+          <p style="font-size: large; margin-top: 4vh;"><%= data[i+j].level %> Levels<br><%= data[i+j].alt_cnt %> Alternatives</p>
+          <div class="hierarchy-icons" id="1">
+            <button class="hierarchy-btn-edit" id=<%= data[i+j].hierarchy_id %>><i class="far fa-edit"></i></button>
+            <button class="hierarchy-btn-view" id=<%= data[i+j].hierarchy_id %>><i class="far fa-eye"></i></button>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  <% } %>
     </div>
   
   <div id="sk-bar" class="snackbar"></div>

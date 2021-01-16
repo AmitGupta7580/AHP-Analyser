@@ -11,9 +11,6 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-var db = firebase.firestore();
-var collection = db.collection("users");
-
 document.getElementById('registerform').addEventListener("submit", (event) => {
   event.preventDefault();
   const username = event.target.usernameSignup.value;
@@ -22,7 +19,7 @@ document.getElementById('registerform').addEventListener("submit", (event) => {
   const recaptcha = document.getElementById('g-recaptcha-response-1').value;
 
   firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
-  
+
   if(recaptcha === ''){
     var sk = document.getElementById("sk-bar");
     sk.innerHTML = "Please tick the recaptcha";
@@ -71,11 +68,23 @@ document.getElementById('registerform').addEventListener("submit", (event) => {
           });
         })
         .then(() => {
-          collection.doc(firebase.auth().currentUser.uid).set({
-            Name : username,
-            Email : email,
-            Method : "Email"
-          });
+          fetch("/registerUser", {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+              "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+            },
+            body: JSON.stringify({'username': username, 'email': email, 'provider': 'local'}),
+          })
+          .then((res) => {
+            if(res.status !== 200 ){
+              var sk = document.getElementById("sk-bar");
+              sk.innerHTML = "Error in registering user";
+              showSnackbar();
+              return false
+            }
+          })
         })
         .then(() => {
           return firebase.auth().signOut();
@@ -88,7 +97,7 @@ document.getElementById('registerform').addEventListener("submit", (event) => {
         return false;
       }
     });
-  }     
+  }
 });
 
 document.getElementById('loginform').addEventListener("submit", (event) => {
@@ -225,11 +234,8 @@ function googleSignin() {
   })
   .then((result) => {
     /** @type {firebase.auth.OAuthCredential} */
-    collection.doc(firebase.auth().currentUser.uid).set({
-      Name : result.user.displayName,
-      Email : result.user.email,
-      Method : "google"
-    });
+    var username = result.user.displayName;
+    var email = result.user.email;
     return firebase.auth().currentUser.getIdToken(true).then((idToken) => {
       return fetch("/sessionLogin", {
         method: "POST",
@@ -240,7 +246,27 @@ function googleSignin() {
         },
         body: JSON.stringify({ idToken }),
       });
-    }).catch(function(error) {
+    })
+    .then(() => {
+      return fetch("/registerUser", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+        },
+        body: JSON.stringify({'username': username, 'email': email, 'provider': 'google'}),
+      })
+      .then((res) => {
+        if(res.status !== 200 ){
+          var sk = document.getElementById("sk-bar");
+          sk.innerHTML = "Error in registering user";
+          showSnackbar();
+          return false
+        }
+      })
+    })
+    .catch(function(error) {
       var sk = document.getElementById("sk-bar");
       sk.innerHTML = "Some error accured";
       showSnackbar();
@@ -264,11 +290,8 @@ function facebookSignin() {
   })
   .then((result) => {
     /** @type {firebase.auth.OAuthCredential} */
-    collection.doc(firebase.auth().currentUser.uid).set({
-      Name : result.user.displayName,
-      Email : result.user.email,
-      Method : "facebook"
-    });
+    var username = result.user.displayName;
+    var email = result.user.email;
     return firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
       return fetch("/sessionLogin", {
         method: "POST",
@@ -279,7 +302,27 @@ function facebookSignin() {
         },
         body: JSON.stringify({ idToken }),
       });
-    }).catch(function(error) {
+    })
+    .then(() => {
+      return fetch("/registerUser", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+        },
+        body: JSON.stringify({'username': username, 'email': email, 'provider': 'facebook'}),
+      })
+      .then((res) => {
+        if(res.status !== 200 ){
+          var sk = document.getElementById("sk-bar");
+          sk.innerHTML = "Error in registering user";
+          showSnackbar();
+          return false
+        }
+      })
+    })
+    .catch(function(error) {
       var sk = document.getElementById("sk-bar");
       sk.innerHTML = "Some error accured";
       showSnackbar();
@@ -303,11 +346,8 @@ function twitterSignin() {
   })
   .then((result) => {
     /** @type {firebase.auth.OAuthCredential} */
-    collection.doc(firebase.auth().currentUser.uid).set({
-      Name : result.user.displayName,
-      Email : result.user.email,
-      Method : "twitter"
-    });
+    var username = result.user.displayName;
+    var email = result.user.email || null;
     return firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
       return fetch("/sessionLogin", {
         method: "POST",
@@ -318,7 +358,27 @@ function twitterSignin() {
         },
         body: JSON.stringify({ idToken }),
       });
-    }).catch(function(error) {
+    })
+    .then(() => {
+      return fetch("/registerUser", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+        },
+        body: JSON.stringify({'username': username, 'email': email, 'provider': 'twitter'}),
+      })
+      .then((res) => {
+        if(res.status !== 200 ){
+          var sk = document.getElementById("sk-bar");
+          sk.innerHTML = "Error in registering user";
+          showSnackbar();
+          return false
+        }
+      })
+    })
+    .catch(function(error) {
       var sk = document.getElementById("sk-bar");
       sk.innerHTML = "Some error accured";
       showSnackbar();

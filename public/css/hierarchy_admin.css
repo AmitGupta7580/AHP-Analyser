@@ -4,6 +4,9 @@
 .tree-toggle {
   display: none;
 }
+.table-toggle {
+  display: none;
+}
 /*  Hierarchy-Body  */
 #hierarchy-body{
   padding-top: 2vh;
@@ -148,4 +151,92 @@
   margin-top: 4vh;
   margin-left: 90vw;
   border-radius: 50%;
+}
+
+
+/*  Expert filling dataset   */
+.hierarchy-view-node-div {
+  display: inline-flex;
+  background-color: rgb(107, 231, 69);
+  padding-left: 0.5vw;
+  padding-right: 0.5vw;
+  opacity: 0.85;
+  width: auto;
+  height: 5vh;
+  overflow-x: auto;
+  font-size: larger;
+  color: white;
+}
+.hierarchy-view-node-down-btn {
+  background-color: rgb(138, 138, 196);
+  height: 5vh;
+  width: 2vw;
+  color: white;
+  border: none;
+}
+.hierarchy-view-node-edt-btn {
+  margin-left: 3vw;
+  background-color: transparent;
+  height: 5vh;
+  width: 2vw;
+  color: white;
+  border: none;
+  opacity: 0.85;
+  border-radius: 50%;
+}
+.hierarchy-view-node-edt-btn:hover {
+  opacity: 1;
+}
+#hierarchy-view-node-div:hover {
+  opacity: 1;
+}
+.empty {
+  background-color: rgb(255, 83, 71);
+}
+.alternative-view-node {
+  padding: 1vh 1vw 1vh 1vw;
+  background-color: rgb(138, 138, 196);
+  opacity: 0.85;
+  color: white;
+  width: 15vw;
+}
+
+/* Table stylings  */
+
+#table-main {
+  overflow: hidden;
+}
+#table-close-btn {
+  background-color: red;
+  color: white;
+  border: none;
+  font-size: xx-large;
+  width: 4vw;
+  height: 8vh;
+  margin-top: 3vh;
+  margin-left: 2vw;
+  border-radius: 50%;
+}
+#table-save-btn {
+  background-color: rgb(116, 252, 53);
+  color: white;
+  border: none;
+  font-size: xx-large;
+  width: 4vw;
+  height: 8vh;
+  margin-top: 3vh;
+  border-radius: 50%;
+}
+#table-alt-heading {
+  width: 85vw;
+  height: 10vh;
+  padding-top: 4.5vh;
+  color: rgb(48, 124, 224);
+  font-size: x-large;
+  text-align: center;
+}
+#table-body {
+  margin: 5vh;
+  overflow: hidden;
+  font-size: larger;
 }

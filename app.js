@@ -3,9 +3,11 @@ const path = require('path')
 var bodyParser = require('body-parser');
 const cookieParser = require("cookie-parser");
 const csrf = require("csurf");
-var { firebase, admin } = require('./firebase');
+var { admin } = require('./firebase');
 
 const csrfMiddleware = csrf({ cookie: true });
+
+const connection = require('./models');
 
 const PORT = 3000
 
@@ -53,7 +55,7 @@ app.use('/',expertsRouter);
 app.use('/',aboutRouter);
 
 // seting admin custom claims 
-var admin_uids = ["puinQ0wU9XgIChPOrGtZVPVL1oK2"];
+var admin_uids = ["HcKl749xNfbvZrMDveQh2Zu5LbN2"];
 var uid;
 for(uid=0; uid<admin_uids.length; uid ++){
   admin.auth().setCustomUserClaims(admin_uids[uid], {
@@ -62,6 +64,7 @@ for(uid=0; uid<admin_uids.length; uid ++){
     admin: true
   });
 }
+
 app.listen(PORT, () => {
   console.log(`App listening at http://localhost:${PORT}`)
 })

@@ -1,7 +1,9 @@
 var express = require('express');
 var { firebase, admin } = require('../firebase');
 
+const mongoose = require('mongoose');
 var router = express.Router();
+var Hierarchy = mongoose.model('Hierarchy');
 
 router.get("/dataset", (req, res) => {
   const sessionCookie = req.cookies.sessionID || "";
@@ -26,27 +28,18 @@ router.get("/dataset/fill", (req, res) => {
     res.redirect('/dataset');
   }
   else{
-    firebase.database().ref('/hierarchy/' + id).once('value')
-    .then((snapshot) => {
-      var data = snapshot.val()['hierarchy'];
-      admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
-      .then((decodedClaims) => {
-        admin.auth().getUser(decodedClaims.uid).then((userRecord) => {
-          if(userRecord.customClaims !== undefined){ // decodedClaims.admin
-            if(userRecord.customClaims['admin']){
-              res.render("enter_data.ejs",{loggedin: true, admin: true, data: data});
-            }
-          }
-          else{
-            res.render("enter_data.ejs",{loggedin: true, admin: false, data: data});
-          }
-        });
-      })
-      .catch((error) => {
+    admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
+    .then((decodedClaims) => {
+      Hierarchy.find({_id: id}).then((doc) => {
+        console.log(doc[0].content);
+        res.render("enter_data.ejs",{loggedin: true, admin: false, data: doc[0].content});
+      }).catch((err) => {
+        console.log(error.message);
         res.redirect('/dataset');
       });
     })
-    .catch((err) => {
+    .catch((error) => {
+      console.log(error.message);
       res.redirect('/dataset');
     });
   }

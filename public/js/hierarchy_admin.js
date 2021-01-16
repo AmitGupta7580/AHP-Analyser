@@ -1,20 +1,9 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyAmHSD4qpxdjKY8wRkhbqUVvJ1lY8_aHt8",
-  authDomain: "adh-analyser.firebaseapp.com",
-  databaseURL: "https://adh-analyser-default-rtdb.firebaseio.com",
-  projectId: "adh-analyser",
-  storageBucket: "adh-analyser.appspot.com",
-  messagingSenderId: "1074482678407",
-  appId: "1:1074482678407:web:ee368e1e36fe4c4fcc0622",
-  measurementId: "G-L3RLFF3F17"
-};
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-var database = firebase.database();
-
-var db = firebase.firestore();
-var hierarchy_collection = db.collection("hierarchy");
+class Hierarchy {
+  constructor(title, childs){
+    this.title = title;
+    this.childs = childs;
+  }
+}
 
 var selected_elem = document.getElementById('crt-1');
 var altcnt = 4;
@@ -184,12 +173,12 @@ function showTreeView() {
   }
   var root = {
     text: {
-        name: crt[0][0]
+        name: crt.title
     }
   }
   chart_config.push(config);
   chart_config.push(root);
-  createTreeView(root, crt[0], chart_config);
+  createTreeView(root, crt.childs, chart_config);
   new Treant( chart_config );
 }
 function closeTreeView() {
@@ -198,15 +187,14 @@ function closeTreeView() {
 }
 function createTreeView(parent, crt, ans) {
   var i;
-  for( i=1; i<crt.length; i++){
-    var val = crt[i][0];
-    console.log(typeof val);
+  for( i=0; i<crt.length; i++){
+    var val = crt[i].title;
     var node = {
       parent: parent,
       innerHTML: val
     };
     ans.push(node);
-    createTreeView(node, crt[i], ans);
+    createTreeView(node, crt[i].childs, ans);
   }
 }
 
@@ -222,25 +210,24 @@ function getAlt(){
   }
   return alternatives;
 }
-function getSubCriteria(node, crt){
-  var ID = node.id;
+function getSubCriteria(node){
   var val = node.querySelector(".hierarchy-body-node-inp").value;
-  var info = [val];
+  var childs_h = [];
   var childs = node.querySelector(".nested").childNodes;
   var cnt_child = (node.querySelector(".nested").childNodes.length);
   var i;
   for( i=1; i<cnt_child; i+=2 ){
     // var n = document.getElementById(ID+'-'+(i+1));
     var n = childs[i];
-    getSubCriteria(n, info);
+    childs_h.push(getSubCriteria(n));
   }
-  crt.push(info);
+  var h = new Hierarchy(val, childs_h);
+  return h;
 }
 function getHierarchy(){
   // geting value of criteria
-  var criteria = [];
   var goal = document.getElementById('crt-1');
-  getSubCriteria(goal, criteria);
+  var criteria = getSubCriteria(goal);
   return criteria;
 }
 function getLevelHierarchy(node){
@@ -265,32 +252,54 @@ function getLevelHierarchy(node){
 function saveHierarchy(){
   var root = document.getElementById('crt-1');
   alt = getAlt();
-  crt = getHierarchy()[0];
+  crt = getHierarchy();
   lvl = getLevelHierarchy(root)+2;
-  
-  var hierarchy = {hierarchy: crt};
-  var id = makeid(32);
-  var doc = { goal: crt[0], level: lvl, alternative: alt , id: id, alt_cnt: altcnt}
-  console.log(id);
-  hierarchy_collection.add(doc)
-  .then((docRef) => {
-    database.ref('hierarchy/'+id).set(hierarchy).then(() => {
-      var sk = document.getElementById("sk-bar");
-      sk.innerHTML = "Hierarchy Saved";
-      showSnackbar();
-      window.location.assign("/hierarchy");
+  var flag = false;
+  loop:
+  while(true){
+    var res = prompt("Maximum Consistency", "0.10");
+    if(res>1 || res<0){
+      alert("Please enter Consistency between 0 to 1");
+    }
+    else if(res === null || res === undefined){
+      break loop;
+    }
+    else{
+      flag = true;
+      break loop;
+    }
+  }
+  if(flag){
+    var doc = { goal: crt.title, level: lvl, alternative: alt , alt_cnt: altcnt, consistency: res};
+    fetch("/savehierarchy", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+      },
+      body: JSON.stringify({'info': doc, 'hierarchy': crt}),
     })
-    .catch((error) => {
-      var sk = document.getElementById("sk-bar");
-      sk.innerHTML = "Noop! Some error accured Try Again";
-      showSnackbar();
-    });
-  })
-  .catch((error) => {
+    .then((res) => {
+      if(res.status !== 200 ){
+        var sk = document.getElementById("sk-bar");
+        sk.innerHTML = "Error in Saving Hierarchy";
+        showSnackbar();
+        return false;
+      }
+      else{
+        var sk = document.getElementById("sk-bar");
+        sk.innerHTML = "Hierarchy Saved Successfully";
+        showSnackbar();
+        return true;
+      }
+    })
+  }
+  else{
     var sk = document.getElementById("sk-bar");
-    sk.innerHTML = "Noop! Some error accured Try Again";
+    sk.innerHTML = "Unable to save Hierarchy<br>You have not enterted the value of consistency. ";
     showSnackbar();
-  });
+  }
 }
 
 /* ======================  Utils functions  ======================== */
@@ -300,14 +309,4 @@ function showSnackbar() {
   setTimeout(function(){ 
     x.classList.toggle("show"); 
   }, 3000);
-}
-
-function makeid(length) {
-  var result           = '';
-  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
 }
