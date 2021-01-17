@@ -240,3 +240,21 @@
   overflow: hidden;
   font-size: larger;
 }
+#hierarchy-cmpt-result-btn {
+  background-color: rgb(107, 231, 69);
+  font-size: x-large;
+  border: none;
+  opacity: 0.85;
+}
+#hierarchy-cmpt-result-btn:hover {
+  opacity: 1;
+}
+#hierarchy-sv-to-cloud-btn {
+  background-color: rgb(107, 231, 69);
+  font-size: x-large;
+  border: none;
+  opacity: 0.85;
+}
+#hierarchy-sv-to-cloud-btn:hover {
+  opacity: 1;
+}

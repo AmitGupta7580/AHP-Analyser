@@ -1,7 +1,7 @@
 var id = window.location.search.split('=')[1];
 console.log(id);
 
-var crt, alt, con, lvl;
+var crt, alt, con, lvl, tabledata, flag=false, leave_nodes=[], filledCrt = [];
 fetch("/gethierarchy", {
   method: "POST",
   headers: {
@@ -32,31 +32,76 @@ fetch("/gethierarchy", {
     alt = info.alternatives;
     con = info.consistency;
     lvl = info.level;
+    hierarchy_id = info.hierarchy_id;
     console.log(data, info);
     console.log('whole Data fetched ');
+    document.getElementById('hierarchy-sv-to-cloud-btn').disabled = false;
+    document.getElementById('hierarchy-cmpt-result-btn').disabled = false;
     var treeviewbtn = getTreeViewBtn();
     document.getElementById('hierarchy-body-heading').parentElement.appendChild(treeviewbtn);
     createAlternative(alt);
-    createHierarchy(crt);
+    tabledata = generateTableData(crt);
+    fetch("/getdataset", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+      },
+      body: JSON.stringify({ id }),
+    })
+    .then((r) => {
+      return r.json();
+    })
+    .then((tab_data) => {
+      if(tab_data[0] !== 'No Document Find'){
+        console.log("Previous record found");
+        flag = true;
+        tabledata = tab_data;
+        // console.log(tabledata);
+        getEmptyCriterias(tabledata, '1');
+      }
+      else{
+        console.log("no previous record found");
+      }
+      console.log(filledCrt);
+      createHierarchy(crt);
+    })
+    .catch((e) => {
+      window.location.assign('/dataset');
+    });
   })
   .catch((err) => {
-    // window.location.assign('/dataset');
+    // console.log(err);
+    window.location.assign('/dataset');
   });
 })
 .catch((error) => {
-  // window.location.assign('/dataset');
+  window.location.assign('/dataset');
 });
 
 
 /* ===========  Creating hierarchy and Alternative view ====================== */
 
+function getEmptyCriterias(tab, id){
+  if(tab[0] !== 'XXX'){
+    filledCrt.push(id);
+  }
+  for( var i=0 ; i<tab[1].length; i++){
+    getEmptyCriterias(tab[1][i], id+'-'+i);
+  }
+  // table data, filledCrt, crt
+}
 function createHierarchy(crt){
   var elem = document.getElementById('hierarchy-view-list');
   var br = document.createElement('BR');
-  var root = getHierarchyViewNode(crt[0], 1);
+  var root = getHierarchyViewNode(crt[0], '1');
   elem.appendChild(br);
   elem.appendChild(root);
   var i;
+  if(crt[1].length === 0){
+    leave_nodes.push('1');
+  }
   for( i=0; i<crt[1].length; i++){
     addViewCriteria(root.querySelector(".nested"), crt[1][i], "1-"+i);
   }
@@ -68,6 +113,9 @@ function addViewCriteria(elem, crt, id){
   elem.appendChild(br);
   elem.appendChild(node);
   var i;
+  if(crt[1].length === 0){
+    leave_nodes.push(id);
+  }
   for( i=0; i<crt[1].length; i++){
     addViewCriteria(node.querySelector(".nested"), crt[1][i], id+'-'+i);
   }
@@ -104,7 +152,12 @@ function getHierarchyViewNode(val, id){
   bt_dw.setAttribute("class", "hierarchy-view-node-down-btn");
   ic_dw.setAttribute("class", "fas fa-angle-down");
   ic_dw.setAttribute("style", "font-size: larger;");
-  d1.setAttribute("class", "hierarchy-view-node-div empty");
+  if(filledCrt.indexOf(id) !== -1){
+    d1.setAttribute("class", "hierarchy-view-node-div");
+  }
+  else{
+    d1.setAttribute("class", "hierarchy-view-node-div empty");
+  }
   p.setAttribute("style", "margin-top: 0.4vh;");
   bt_ed.setAttribute("class", "hierarchy-view-node-edt-btn");
   bt_ed.setAttribute("id", id);
@@ -228,11 +281,13 @@ var table;
 var clicked_crt_id;
 function showTable(id) {
   clicked_crt_id = id;
+  var data = getTableDataById(tabledata, id);
   document.querySelector('.main').classList.toggle("table-toggle");
   document.querySelector('.datatable').classList.toggle("table-toggle");
   var T,A;
   var val = document.getElementById(id).previousSibling.innerHTML;
-  if(id.length === ((2*lvl)-3)){
+  console.log(leave_nodes);
+  if(leave_nodes.indexOf(id) !== -1){
     A = alt;
     T = getTable(val, 1);
   }
@@ -251,11 +306,11 @@ function showTable(id) {
     elem.removeChild(elem.firstChild);
   }
   elem.append(T);
-  var tabledata = getTabledata(A);
+  var table_data = getTabledata(A, data);
   var columndata = getColumndata(A);
 
   table = new Tabulator("#table-really", {
-    data: tabledata,
+    data: table_data,
     columns: columndata,
     cellEdited:function(cell){
       var val = cell.getValue();
@@ -280,26 +335,47 @@ function showTable(id) {
 
   table.clearSort();
 }
-function getTabledata(A){
+function getTabledata(A, data){
   var ans = [];
-  for(var i=0; i<A.length; i++){
-    var txt = '{"id" : "'+i+'", "name": "'+A[i]+'"';
-    for(var j=0; j<A.length; j++) {
-      if(i>j){
-        txt += ', "value'+j+'": "1/9"';
+  if(data === 'XXX'){
+    for(var i=0; i<A.length; i++){
+      var txt = '{"id" : "'+i+'", "name": "'+A[i]+'"';
+      for(var j=0; j<A.length; j++) {
+        if(i>j){
+          txt += ', "value'+j+'": "1/9"';
+        }
+        else if(i<j) {
+          txt += ', "value'+j+'": "9"';
+        }
+        else {
+          txt += ', "value'+j+'": "1"';
+        }
       }
-      else if(i<j) {
-        txt += ', "value'+j+'": "9"';
-      }
-      else {
-        txt += ', "value'+j+'": "1"';
-      }
-      
+      txt += '}'
+      console.log(txt);
+      var p = JSON.parse(txt);
+      ans.push(p);
     }
-    txt += '}'
-    console.log(txt);
-    var p = JSON.parse(txt);
-    ans.push(p);
+  }
+  else{
+    for(var i=0; i<A.length; i++){
+      var txt = '{"id" : "'+i+'", "name": "'+A[i]+'"';
+      for(var j=0; j<A.length; j++) {
+        if(i>j){
+          txt += ', "value'+j+'": "'+data[i][j]+'"';
+        }
+        else if(i<j) {
+          txt += ', "value'+j+'": "'+data[i][j]+'"';
+        }
+        else {
+          txt += ', "value'+j+'": "'+data[i][j]+'"';
+        }
+      }
+      txt += '}'
+      console.log(txt);
+      var p = JSON.parse(txt);
+      ans.push(p);
+    }
   }
   console.log(ans);
   return ans;
@@ -321,6 +397,15 @@ function getColumndata(A){
   }
   console.log(ans);
   return ans;
+}
+function getTableDataById(M, id){
+  if(id.length === 1){
+    return M[0];
+  }
+  else{
+    id = id.slice(2);
+    return getTableDataById(M[1][id[0]], id);
+  }
 }
 function getTable(t, x){
   /* 
@@ -410,14 +495,113 @@ function closeTable() {
   document.querySelector('.datatable').classList.toggle("table-toggle");
 }
 function saveTable() {
-  document.getElementById(clicked_crt_id).parentElement.classList.toggle('empty');
+  updateTableData(clicked_crt_id, table.getData());
+  document.getElementById(clicked_crt_id).parentElement.classList.remove('empty');
   console.log('savinig table');
-  console.log(table.getData());
   document.querySelector('.main').classList.toggle("table-toggle");
   document.querySelector('.datatable').classList.toggle("table-toggle");
+}
+function checkAllTablesAreFill(M) {
+  if(M[0] === 'XXX'){
+    return false;
+  }
+  else{
+    for(var i=0;i<M[1].length; i++){
+      if(!checkAllTablesAreFill(M[1][i])){
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+/* ======================   Function realted to dataset and cloud ================ */
+function generateTableData(A) {
+  // tabledata, crt
+  var x = ['XXX'];
+  var ch = [];
+  for(var i=0; i<A[1].length; i++){
+    var p = generateTableData(A[1][i]);
+    ch.push(p);
+  }
+  x.push(ch);
+  return x;
+}
+function updateTableData(id, data){
+  // forming matrix of data
+  var mat = [];
+  for(var i=0; i<data.length; i++){
+    var r = [];
+    var cnt=0;
+    for(var item in data[i]){
+      if(cnt>=2){
+        r.push(data[i][item]);
+      }
+      cnt++;
+    }
+    mat.push(r);
+  }
+  console.log(mat);
+  console.log(tabledata);
+  tabledata = solve(id, mat, tabledata);
+  console.log(tabledata);
+}
+function solve(id, M, R){
+  if(id.length === 1){
+    var x = [];
+    x[0] = M;
+    x[1] = R[1];
+    return x;
+  }
+  else{
+    var x = R;
+    id = id.slice(2);
+    x[1][id[0]] = solve(id, M, R[1][id[0]]);
+    return x;
+  }
 }
 
 /* ======================   Function to save data to cloud ================ */
 function saveDataToCloud(){
-
+  fetch("/savedataset", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+    },
+    body: JSON.stringify({'tabledata': tabledata, 'hierarchy_id': id, 'flag': flag}),
+  })
+  .then((response) => {
+    if(response.status === 200 ){
+      console.log("Data Saved Successfully");
+      var sk = document.getElementById("sk-bar");
+      sk.innerHTML = "Data Saved Successfully";
+      showSnackbar();
+    }
+    else{
+      console.log("Error in Data Saving");
+      var sk = document.getElementById("sk-bar");
+      sk.innerHTML = "Error in Data Saving";
+      showSnackbar();
+    }
+  })
+  .catch((err) => {
+    console.log(err);
+    console.log("Error in Data Saving");
+    var sk = document.getElementById("sk-bar");
+    sk.innerHTML = "Error in Data Saving";
+    showSnackbar();
+  });
+}
+function computeResult() {
+  if(checkAllTablesAreFill(tabledata)){
+    console.log('result is computing');
+    // code for calculating weights
+  }
+  else{
+    var sk = document.getElementById("sk-bar");
+    sk.innerHTML = "First fill all the Tabels";
+    showSnackbar();
+  }
 }
