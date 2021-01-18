@@ -4,7 +4,8 @@ var { firebase, admin } = require('../firebase');
 const mongoose = require('mongoose');
 var router = express.Router();
 const UserModel = mongoose.model('User');
-var HierarchyModel = mongoose.model('Hierarchy');
+const HierarchyModel = mongoose.model('Hierarchy');
+const HierarchyInfoModel = mongoose.model('HierarchyInfo');
 const DatasetModel = mongoose.model('Dataset');
 
 router.get("/dataset", (req, res) => {
@@ -33,8 +34,31 @@ router.get("/dataset/fill", (req, res) => {
     admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
     .then((decodedClaims) => {
       HierarchyModel.find({_id: id}).then((doc) => {
-        console.log(doc[0].content);
-        res.render("enter_data.ejs",{loggedin: true, admin: false, data: doc[0].content});
+        HierarchyInfoModel.find({hierarchy_id: id}).then((d) => {
+          UserModel.find({'uuid': decodedClaims.uid}).then((r) => {
+            var author_name = r[0].username;
+            DatasetModel.find({'author': author_name, 'hierarchy_id': id}).then((f) => {
+              if(f.length === 0){
+                res.render("enter_data.ejs",{loggedin: true, admin: false, crt: doc[0].content, info: d[0], get: false});
+              }
+              else{
+                res.render("enter_data.ejs",{loggedin: true, admin: false, crt: doc[0].content, info: d[0], data: f[0].content, get: true});
+              }
+            })
+            .catch((b) => {
+              console.log(b);
+              res.redirect('/dataset');
+            });
+          })
+          .catch((a) => {
+            console.log(a);
+            res.redirect('/dataset');
+          });
+        })
+        .catch((e) => {
+          console.log(error.message);
+          res.redirect('/dataset');
+        })
       }).catch((err) => {
         console.log(error.message);
         res.redirect('/dataset');
@@ -47,6 +71,7 @@ router.get("/dataset/fill", (req, res) => {
   }
 });
 
+/* end-points of dataset section */
 router.post("/savedataset", (req, res) => {
   var tabledata = req.body.tabledata;
   var hierarchy_id = req.body.hierarchy_id;
@@ -63,7 +88,6 @@ router.post("/savedataset", (req, res) => {
           {'content': tabledata}
         )
         .then((doc) => {
-          console.log("Dataset Updated");
           res.send('Dataset Updated');
         })
         .catch((e) => {
@@ -78,7 +102,6 @@ router.post("/savedataset", (req, res) => {
         Dataset.hierarchy_id = hierarchy_id;
         Dataset.save((e, doc) => {
           if(!e){
-            console.log("Dataset Saved");
             res.send('Dataset Saved');
           }
           else{
@@ -97,37 +120,6 @@ router.post("/savedataset", (req, res) => {
     console.log(error.message);
     res.status(401).send("UNAUTHORIZED REQUEST!");
   });
-});
-
-router.post("/getdataset", (req, res) => {
-  const hierarchy_id = req.body.id.toString();
-  const sessionCookie = req.cookies.sessionID || "";
-  admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
-  .then((decodedClaims) => {
-    UserModel.find({'uuid': decodedClaims.uid}).then((doc) => {
-      var author_name = doc[0].username;
-      DatasetModel.find({'author': author_name, 'hierarchy_id': hierarchy_id}).then((d) => {
-        if(d.length === 0){
-          res.send(['No Document Find']);
-        }
-        else{
-          res.send(d[0].content);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(401).send("UNAUTHORIZED REQUEST!");
-    });
-  })
-  .catch((error) => {
-    console.log(error.message);
-    res.status(401).send("UNAUTHORIZED REQUEST!");
-  });
-  
 });
 
 module.exports = router;

@@ -3,12 +3,12 @@ var { firebase, admin } = require('../firebase');
 const mongoose = require('mongoose');
 
 var router = express.Router();
-const HierarchyInfo = mongoose.model('HierarchyInfo');
-const Hierarchy = mongoose.model('Hierarchy');
+const HierarchyInfoModel = mongoose.model('HierarchyInfo');
+const HierarchyModel = mongoose.model('Hierarchy');
 
 router.get("/hierarchy", (req, res) => {
   const sessionCookie = req.cookies.sessionID || "";
-  HierarchyInfo.find((err, doc) => {
+  HierarchyInfoModel.find((err, doc) => {
     if(!err){
       var data = doc;
       admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
@@ -41,69 +41,24 @@ router.get("/hierarchy/view", (req, res) => {
     res.redirect('/hierarchy');
   }
   else{
-    admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
-      .then((decodedClaims) => {
-        admin.auth().getUser(decodedClaims.uid).then((userRecord) => {
-          if(userRecord.customClaims !== undefined){ // decodedClaims.admin
-            if(userRecord.customClaims['admin']){
-              res.render("hierarchy_view.ejs",{loggedin: true, admin: true});
-            }
-          }
-          else{
-            res.render("hierarchy_view.ejs",{loggedin: true, admin: false});
-          }
-        });
+    admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */).then((decodedClaims) => {
+      HierarchyModel.find({_id: id}).then((doc) => {
+        res.render("hierarchy_view.ejs",{loggedin: true, admin: true, data: doc[0].content});
       })
-      .catch((error) => {
-        res.render("hierarchy_view.ejs",{loggedin: false, admin: false});
-      });
-  }
-});
-
-/* view hierarvhy end-point */
-router.post("/gethierarchy", (req, res) => {
-  const id = req.body.id.toString();
-  const sessionCookie = req.cookies.sessionID || "";
-  if(id === undefined || id === ""){
-    res.status(401).send("UNAUTHORIZED REQUEST!");
-  }
-  else{
-    admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
-      .then((decodedClaims) => {
-        Hierarchy.find({_id: id}).then((doc) => {
-          res.send(doc[0].content);
-        })
-        .catch((err) => {
-          console.log(err.message);
-          res.status(401).send("UNAUTHORIZED REQUEST!");
-        })
+      .catch((err) => {
+        console.log(err.message);
+        res.redirect('/hierarchy');
       })
-      .catch((error) => {
-        res.status(401).send("UNAUTHORIZED REQUEST!");
-      });
-  }
-});
-
-router.post("/gethierarchyinfo", (req, res) => {
-  const id = req.body.id.toString();
-  const sessionCookie = req.cookies.sessionID || "";
-  if(id === undefined || id === ""){
-    res.status(401).send("UNAUTHORIZED REQUEST!");
-  }
-  else{
-    admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
-      .then((decodedClaims) => {
-        HierarchyInfo.find({hierarchy_id: id}).then((doc) => {
-          res.send(doc[0]);
-        })
-        .catch((err) => {
-          console.log(err.message);
-          res.status(401).send("UNAUTHORIZED REQUEST!");
-        })
+    })
+    .catch((error) => {
+      HierarchyModel.find({_id: id}).then((doc) => {
+        res.render("hierarchy_view.ejs",{loggedin: false, admin: false, data: doc[0].content});
       })
-      .catch((error) => {
-        res.status(401).send("UNAUTHORIZED REQUEST!");
-      });
+      .catch((err) => {
+        console.log(err.message);
+        res.redirect('/hierarchy');
+      })
+    });
   }
 });
 

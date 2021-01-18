@@ -4,7 +4,6 @@ var { firebase, admin } = require('../firebase');
 
 var router = express.Router();
 
-const UserModel = mongoose.model('User');
 const HierarchyInfoModel = mongoose.model('HierarchyInfo');
 const HierarchyModel = mongoose.model('Hierarchy');
 

@@ -14,3 +14,5 @@ const User = require('./userSchema');
 const HierarchyInfo = require('./hierarchyInfoSchema');
 const Hierarchy = require('./hierarchySchema');
 const Dataset = require('./datasetSchema');
+const Result = require('./resultSchema');
+const Globalresult = require('./globalresultSchema');

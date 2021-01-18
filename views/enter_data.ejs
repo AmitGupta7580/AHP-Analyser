@@ -84,7 +84,16 @@
   </span>
 
   <div id="sk-bar" class="snackbar"></div>
-
+  <script>
+    var tabledata, flag=false;
+    var crt = <%- JSON.stringify(crt) %>;
+    var info = <%- JSON.stringify(info) %>;
+    <% if(get) { %>
+      console.log("Previous record found");
+      flag = true;
+      tabledata = <%- JSON.stringify(data) %>;
+    <% } %>
+  </script>
   <script src="/static/js/app.js"></script>
   <script src="/static/js/enter_data.js"></script>
   <script src="/static/js/raphael.js"></script>

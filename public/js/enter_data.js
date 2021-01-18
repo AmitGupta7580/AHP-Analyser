@@ -1,84 +1,27 @@
 var id = window.location.search.split('=')[1];
 console.log(id);
 
-var crt, alt, con, lvl, tabledata, flag=false, leave_nodes=[], filledCrt = [];
-fetch("/gethierarchy", {
-  method: "POST",
-  headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    "CSRF-Token": Cookies.get("XSRF-TOKEN"),
-  },
-  body: JSON.stringify({ id }),
-})
-.then((response) => {
-  return response.json();
-})
-.then((data) => {
-  fetch("/gethierarchyinfo", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      "CSRF-Token": Cookies.get("XSRF-TOKEN"),
-    },
-    body: JSON.stringify({ id }),
-  })
-  .then((res) => {
-    return res.json();
-  })
-  .then((info) => {
-    crt = data;
-    alt = info.alternatives;
-    con = info.consistency;
-    lvl = info.level;
-    hierarchy_id = info.hierarchy_id;
-    console.log(data, info);
-    console.log('whole Data fetched ');
-    document.getElementById('hierarchy-sv-to-cloud-btn').disabled = false;
-    document.getElementById('hierarchy-cmpt-result-btn').disabled = false;
-    var treeviewbtn = getTreeViewBtn();
-    document.getElementById('hierarchy-body-heading').parentElement.appendChild(treeviewbtn);
-    createAlternative(alt);
-    tabledata = generateTableData(crt);
-    fetch("/getdataset", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "CSRF-Token": Cookies.get("XSRF-TOKEN"),
-      },
-      body: JSON.stringify({ id }),
-    })
-    .then((r) => {
-      return r.json();
-    })
-    .then((tab_data) => {
-      if(tab_data[0] !== 'No Document Find'){
-        console.log("Previous record found");
-        flag = true;
-        tabledata = tab_data;
-        // console.log(tabledata);
-        getEmptyCriterias(tabledata, '1');
-      }
-      else{
-        console.log("no previous record found");
-      }
-      console.log(filledCrt);
-      createHierarchy(crt);
-    })
-    .catch((e) => {
-      window.location.assign('/dataset');
-    });
-  })
-  .catch((err) => {
-    // console.log(err);
-    window.location.assign('/dataset');
-  });
-})
-.catch((error) => {
-  window.location.assign('/dataset');
-});
+var alt, con, lvl, leave_nodes=[], filledCrt = [];
+console.log(crt, info, tabledata, flag);
+
+var randomIndex = [0, 0, 0.58, 0.9, 1.12, 1.24, 1.32, 1.41, 1.45, 1.49];
+alt = info.alternatives;
+con = info.consistency;
+lvl = info.level;
+hierarchy_id = info.hierarchy_id;
+console.log('whole Data fetched ');
+if(flag){
+  getEmptyCriterias(tabledata, '1');
+}
+else{
+  tabledata = generateTableData(crt);
+}
+document.getElementById('hierarchy-sv-to-cloud-btn').disabled = false;
+document.getElementById('hierarchy-cmpt-result-btn').disabled = false;
+var treeviewbtn = getTreeViewBtn();
+document.getElementById('hierarchy-body-heading').parentElement.appendChild(treeviewbtn);
+createAlternative(alt);
+createHierarchy(crt);
 
 
 /* ===========  Creating hierarchy and Alternative view ====================== */
@@ -563,7 +506,7 @@ function solve(id, M, R){
 
 /* ======================   Function to save data to cloud ================ */
 function saveDataToCloud(){
-  fetch("/savedataset", {
+  return fetch("/savedataset", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -574,9 +517,8 @@ function saveDataToCloud(){
   })
   .then((response) => {
     if(response.status === 200 ){
-      console.log("Data Saved Successfully");
       var sk = document.getElementById("sk-bar");
-      sk.innerHTML = "Data Saved Successfully";
+      sk.innerHTML = "Data Uploaded Successfully";
       showSnackbar();
     }
     else{
@@ -594,14 +536,205 @@ function saveDataToCloud(){
     showSnackbar();
   });
 }
+
+/* =============   Mathematical Part of Project calculating Weights and consistency  ========== */
+var con_check = true;
+// require variables for cumputing result (priorities)
+// tabledata, leave_nodes, getTableDataById
 function computeResult() {
   if(checkAllTablesAreFill(tabledata)){
-    console.log('result is computing');
     // code for calculating weights
+    var w = calculate(tabledata);
+    if(con_check){
+      // calculating priorities
+      var priority = calculatePriority();
+      console.log(priority);
+      if(priority !== []){
+        saveDataToCloud().then(() => {
+          // saving result
+          return fetch("/saveresult", {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+              "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+            },
+            body: JSON.stringify({'tabledata': tabledata, 'hierarchy_id': id, 'priority': priority}),
+          })
+          .then((response) => {
+            if(response.status === 200 ){
+              setTimeout(function(){ 
+                window.location.assign('/home/expert/view?res_id='+id+'&own=true');
+              }, 2000);
+            }
+            else{
+              console.log("Error in Showing result");
+              var sk = document.getElementById("sk-bar");
+              sk.innerHTML = "Error in Showing result";
+              showSnackbar();
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            console.log("Error in Showing result");
+            var sk = document.getElementById("sk-bar");
+            sk.innerHTML = "Error in Showing result";
+            showSnackbar();
+          });
+        });
+      }
+      else{
+        var sk = document.getElementById("sk-bar");
+        sk.innerHTML = "Some Error accured in calculating Result";
+        showSnackbar();
+      }
+    }
+    else{
+      var sk = document.getElementById("sk-bar");
+      sk.innerHTML = "Your Data is Inconsistent";
+      showSnackbar();
+    }
   }
   else{
     var sk = document.getElementById("sk-bar");
     sk.innerHTML = "First fill all the Tabels";
     showSnackbar();
+  }
+}
+function calculatePriority(){
+  var leave_nodes_weights = [];
+  var alt_priority = [];
+  var priority = [];
+  for(var i=0; i<leave_nodes.length; i++){
+    leave_nodes_weights.push(calculateLeaveNodeWeight(leave_nodes[i]));
+    alt_priority.push(calculateWeights(getTableDataById(tabledata, leave_nodes[i])));
+  }
+  var sum = 0;
+  for(var i=0; i< leave_nodes_weights.length; i++){
+    sum += leave_nodes_weights[i];
+  }
+  if(sum !== 1){
+    console.log('some glitch happen');
+  }
+  else{
+    // getting best alternative
+    for(var i=0; i<leave_nodes_weights.length; i++){
+      for(var j=0; j<alt.length; j++){
+        alt_priority[i][j] *= leave_nodes_weights[i];
+      }
+    }
+    for(var i=0; i<alt.length; i++){
+      priority.push(0);
+    }
+    for(var i=0; i<leave_nodes_weights.length; i++){
+      for(var j=0; j<alt.length; j++){
+        priority[j] += alt_priority[i][j];
+      }
+    }
+    var x=0;
+    for(var i=0; i<priority.length; i++){
+      x += priority[i];
+    }
+    if(x === 1){
+      console.log('Resulte is computed successfully');
+    }
+  }
+  return priority;
+}
+function calculateLeaveNodeWeight(id){
+  if(id.length === 3){
+    return calculateWeights(getTableDataById(tabledata, id.split('-')[0]))[id.split('-')[1]];
+  }
+  else{
+    return (calculateLeaveNodeWeight(id.slice(0, id.length-2)))*calculateWeights(getTableDataById(tabledata, id.slice(0, id.length-2)))[id[id.length-1]];
+  }
+}
+function calculate(data) {
+  var w = [];
+  w.push(calculateWeights(data[0]));
+  var ch = [];
+  if(!checkConsistency(data[0], w[0])){
+    con_check = false;
+  }
+  for(var i=0; i<data[1].length; i++){
+    ch.push(calculate(data[1][i]));
+  }
+  w.push(ch);
+  return w;
+}
+function calculateWeights(M){
+  var n = M.length, weights = [], sum = [];
+  for(var i=0; i<n; i++){
+    sum.push(0);
+    weights.push(0);
+  }
+  for(var i=0; i<n; i++){
+    for(var j=0; j<n; j++){
+      if(M[i][j].length > 1){
+        var y = M[i][j].split('/');
+        sum[j] += Number(y[0])/Number(y[1]);
+      }
+      else{
+        sum[j] += Number(M[i][j]);
+      }
+    }
+  }
+  for(var i=0; i<n; i++){
+    for(var j=0; j<n; j++){
+      var x;
+      if(M[i][j].length > 1){
+        var y = M[i][j].split('/');
+        x = Number(y[0])/Number(y[1]);
+      }
+      else{
+        x = Number(M[i][j]);
+      }
+      weights[i] += x/sum[j];
+    }
+  }
+  for(var i=0; i<n; i++){
+    weights[i] /= n;
+  }
+  return weights;
+}
+function checkConsistency(M, weights) {
+  var n = M.length;
+  var T = [];
+  for(var i=0; i<n; i++){
+    var p = [];
+    for(var j=0; j<n; j++){
+      var x;
+      if(M[i][j].length > 1){
+        var y = M[i][j].split('/');
+        x = Number(y[0])/Number(y[1]);
+      }
+      else{
+        x = Number(M[i][j]);
+      }
+      p.push(x*weights[j]);
+    }
+    T.push(p);
+  }
+  var weighted_sum = [];
+  for(var i=0; i<n; i++){
+    weighted_sum.push(0);
+    for(var j=0; j<n; j++){
+      weighted_sum[i] += T[i][j];
+    }
+  }
+  var lamda = 0;
+  for(var i=0; i<n; i++){
+    weighted_sum[i] /= weights[i];
+    lamda += weighted_sum[i];
+  }
+  lamda /= n;
+  var ci = (lamda - n)/(n-1);
+  var ri = randomIndex[n];
+  var consistency = (ci/ri);
+  if(consistency <= con){
+    return true;
+  }
+  else{
+    return false;
   }
 }
