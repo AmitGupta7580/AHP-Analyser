@@ -17,6 +17,7 @@
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
   <link href="/static/css/styles.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/Dataset.css" rel="stylesheet" type="text/css">
 </head>
 <body>
   <!-- top navigation bar -->
@@ -37,9 +38,28 @@
     </div>
   </nav>
   <!-- main content -->
-  <div>
-    <h1>Dataset</h1>
+  <div id="dataset-background">
   </div>
+  <div id="dataset-main">
+    <% for(var i=0; i<data.length; i+=4){ %>
+      <div class="dataset-rw" <% if(i==0) { %> style="margin-top: 0vh;" <% } %> >
+        <% for(var j=0; j<4&&(i+j)<data.length; j++) { %>
+          <div class="dataset-bx" style="background-color: #69DAE0;">
+            <h2 style="margin-top: 1.5vh;"> <%= data[i+j].hierarchy_name %> </h2>
+            <p style="font-size: large;"> <%= data[i+j].level %> Levels<br> <%= data[i+j].alt_cnt %> Alternatives <br>Inconsistency : <%= data[i+j].inconsistency %>% </p>
+            <div class="dataset-expert-btn" onclick="window.location.assign('/experts?id=<%= data[i+j].author_id %>')">
+              <i class="fas fa-user-tie"></i>&nbsp;&nbsp;<%= data[i+j].author %>
+            </div>
+            <div class="dataset-icons" id="<%= i+j %>">
+              <button class="dataset-btn-hierarchy" onclick="window.location.assign('/hierarchy/view?id=<%= data[i+j].hierarchy_id %>')"><i class="fas fa-sitemap"></i></button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <button class="dataset-btn-data" onclick="window.location.assign('/dataset/view?id=<%= data[i+j]._id %>')"><i class="fas fa-chart-bar"></i></button>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+
   <div id="sk-bar" class="snackbar"></div>
 
   <script src="/static/js/app.js"></script>

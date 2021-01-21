@@ -2,7 +2,12 @@ const mongoose = require('mongoose');
 
 var ResultSchema = new mongoose.Schema({
     author: String,
-    hierarchy_id: String, 
+    author_id: String,
+    level: Number,
+    alt_cnt: Number,
+    inconsistency: Number,
+    hierarchy_name: String,
+    hierarchy_id: String,
     priority: Array,
     data: Array
 });

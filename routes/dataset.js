@@ -7,20 +7,33 @@ const UserModel = mongoose.model('User');
 const HierarchyModel = mongoose.model('Hierarchy');
 const HierarchyInfoModel = mongoose.model('HierarchyInfo');
 const DatasetModel = mongoose.model('Dataset');
+const ResultModel = mongoose.model('Result'); 
 
 router.get("/dataset", (req, res) => {
   const sessionCookie = req.cookies.sessionID || "";
-  admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
-  .then((decodedClaims) => {
-    if(true){ // decodedClaims.expert
-      res.render("dataset.ejs", {loggedin: true, expert: true});
+  ResultModel.find((err, doc) => {
+    if(!err){
+      var data = doc;
+      admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
+      .then((decodedClaims) => {
+        admin.auth().getUser(decodedClaims.uid).then((userRecord) => {
+          if(userRecord.customClaims !== undefined){ // decodedClaims.admin
+            if(userRecord.customClaims['admin']){
+              res.render("dataset.ejs", {loggedin: true, expert: true, data: data});
+            }
+          }
+          else{
+            res.render("dataset.ejs", {loggedin: true, expert: false, data: data});
+          }
+        });
+      })
+      .catch((error) => {
+        res.render("dataset.ejs", {loggedin: false, expert: false, data: data});
+      });
     }
     else{
-      res.render("dataset.ejs", {loggedin: true, expert: false});
+      res.status(401).send("UNAUTHORIZED REQUEST!");
     }
-  })
-  .catch((error) => {
-    res.render("dataset.ejs", {loggedin: false, expert: false});
   });
 });
 
@@ -42,7 +55,7 @@ router.get("/dataset/fill", (req, res) => {
                 res.render("enter_data.ejs",{loggedin: true, admin: false, crt: doc[0].content, info: d[0], get: false});
               }
               else{
-                res.render("enter_data.ejs",{loggedin: true, admin: false, crt: doc[0].content, info: d[0], data: f[0].content, get: true});
+                res.render("enter_data.ejs",{loggedin: true, admin: false, crt: doc[0].content, info: d[0], data: f[0].content, get: true, inconsistency: f[0].inconsistency});
               }
             })
             .catch((b) => {
@@ -71,8 +84,46 @@ router.get("/dataset/fill", (req, res) => {
   }
 });
 
+router.get("/dataset/view", (req, res) => {
+  var res_id = req.query.id;
+  const sessionCookie = req.cookies.sessionID || "";
+  if(res_id === undefined || res_id === ""){
+    res.redirect('/dataset');
+  }
+  else{
+    admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
+    .then((decodedClaims) => {
+      ResultModel.find({_id: res_id}).then((document) => {
+        var data = document[0];
+        var id = data.hierarchy_id;
+        HierarchyModel.find({_id: id}).then((doc) => {
+          HierarchyInfoModel.find({hierarchy_id: id}).then((d) => {
+            res.render("data_view.ejs",{loggedin: true, crt: doc[0].content, info: d[0], get: true, data: data});
+          })
+          .catch((e) => {
+            console.log(error.message);
+            res.redirect('/dataset');
+          })
+        }).catch((err) => {
+          console.log(error.message);
+          res.redirect('/dataset');
+        });
+      })
+      .catch((err) => {
+        console.log(error.message);
+        res.redirect('/dataset');
+      });
+    })
+    .catch((error) => {
+      console.log(error.message);
+      res.redirect('/dataset');
+    });
+  }
+});
+
 /* end-points of dataset section */
 router.post("/savedataset", (req, res) => {
+  var inconsistency = req.body.inconsistency;
   var tabledata = req.body.tabledata;
   var hierarchy_id = req.body.hierarchy_id;
   var flag = req.body.flag;
@@ -85,7 +136,7 @@ router.post("/savedataset", (req, res) => {
       if(flag){
         DatasetModel.update(
           {'author': author_name, 'hierarchy_id': hierarchy_id},
-          {'content': tabledata}
+          {'content': tabledata, 'inconsistency': inconsistency}
         )
         .then((doc) => {
           res.send('Dataset Updated');
@@ -97,6 +148,7 @@ router.post("/savedataset", (req, res) => {
       }
       else{
         var Dataset = new DatasetModel();
+        Dataset.inconsistency = inconsistency;
         Dataset.content = tabledata;
         Dataset.author = author_name;
         Dataset.hierarchy_id = hierarchy_id;

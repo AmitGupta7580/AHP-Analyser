@@ -93,6 +93,10 @@ router.get("/home/expert/view", (req, res) => {
 
 /* end-points of result section */
 router.post("/saveresult", (req, res) => {
+  var level = req.body.level;
+  var alt_cnt = req.body.alt_cnt;
+  var inconsistency = req.body.inconsistency;
+  var hierarchy_name = req.body.goal;
   var data = req.body.tabledata;
   var hierarchy_id = req.body.hierarchy_id;
   var priority = req.body.priority;
@@ -101,12 +105,18 @@ router.post("/saveresult", (req, res) => {
   .then((decodedClaims) => {
     UserModel.find({'uuid': decodedClaims.uid}).then((doc) => {
       var doc_id = doc[0]._id;
+      var author = doc[0].username;
       // save or updating Result to database
       ResultModel.find({'author': doc_id, 'hierarchy_id': hierarchy_id}).then((d) => {
         if(d[0] === undefined){
           // create new result and save it
           var Result = new ResultModel();
-          Result.author = doc_id;
+          Result.level = level;
+          Result.alt_cnt = alt_cnt;
+          Result.inconsistency = inconsistency.toFixed(4)*100;
+          Result.hierarchy_name = hierarchy_name;
+          Result.author_id = doc_id;
+          Result.author = author;
           Result.hierarchy_id = hierarchy_id;
           Result.priority = priority;
           Result.data = data;

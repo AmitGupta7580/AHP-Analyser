@@ -7,6 +7,9 @@
 .table-toggle {
   display: none;
 }
+.res-toggle {
+  display: none;
+}
 /*  Hierarchy-Body  */
 #hierarchy-body{
   padding-top: 2vh;
@@ -237,6 +240,7 @@
 }
 #table-body {
   margin: 5vh;
+  margin-top: 2vh;
   overflow: hidden;
   font-size: larger;
 }
@@ -257,4 +261,45 @@
 }
 #hierarchy-sv-to-cloud-btn:hover {
   opacity: 1;
+}
+
+/*  Result page styling  */
+
+#result-heading {
+  width: 78vw;
+  height: 10vh;
+  padding-top: 4.5vh;
+  color: rgb(48, 124, 224);
+  font-size: x-large;
+  text-align: center;
+}
+#result-close-btn {
+  background-color: red;
+  color: white;
+  border: none;
+  font-size: xx-large;
+  width: 4vw;
+  height: 8vh;
+  margin-top: 3vh;
+  margin-left: 2vw;
+  border-radius: 50%;
+}
+#result-save-btn {
+  background-color: rgb(116, 252, 53);
+  color: white;
+  border: none;
+  font-size: x-large;
+  width: 13vw;
+  height: 8vh;
+  margin-top: 3vh;
+  opacity: 0.85;
+}
+#result-save-btn:hover {
+  opacity: 1;
+}
+#Incon {
+  margin-top: 3vh;
+  margin-left: 5vw;
+  display: inline-flex;
+  text-align: center;
 }
