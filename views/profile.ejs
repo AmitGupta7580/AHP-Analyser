@@ -34,11 +34,37 @@
     </div>
   </nav>
   <!-- main content -->
-  <div>
-    <p> Username : <%= name %> </p>
-    <p> Email : <%= email %> </p>
-    <p> Admin : <% if (admin) { %> true <% } else { %> false <% } %> </p>
+  <div style="height: 79vh; width: 95vw; margin: 5vh; display: inline-flex;">
+    <div id="profile-left">
+      <i class="fas fa-user-tie" style="font-size: 150px; margin-top: 8vh;"></i><br><br><br>
+      <h1> <%= name %> </h1><br>
+      <h5> <%= email %> </h5><br>
+      <% if(admin && owner) { %>
+        <h4>Welcome Admin</h4>
+      <% } %>
+    </div>
+    <div id="profile-right">
+      <h2 style="color: red; margin-top: 2vh;"><b>Dataset</b></h2>
+      <div id="profile-dataset-list">
+        <ul style="margin-left: 0vh;">
+          <% for(var i=0; i<dataset.length; i++) { %>
+            <li>
+              <div class="profile-list-item">
+                <p style="width: 39vw;"> <%= dataset[i].goal %> </p>
+                <progress class="profile-dataset-progbar" value="<%= dataset[i].percentage %>" max="100"> 32% </progress>
+                <% if(owner) { %>
+                  <button class="profile-show-btn" onclick="window.location.assign('/dataset/fill?id=<%= dataset[i].hierarchy_id %>')"><i class="fas fa-greater-than"></i></button>
+                <% } else { %>
+                  <button class="profile-show-btn" onclick="window.location.assign('/dataset/view?hierarchy_id=<%= dataset[i].hierarchy_id %>&auth_id=<%= dataset[i].author_id %>')"><i class="fas fa-greater-than"></i></button>
+                <% } %>
+              </div>
+            </li>
+          <% } %>
+        </ul>
+      </div>
+    </div>
   </div>
+
   <div id="sk-bar" class="snackbar"></div>
 
   <script src="/static/js/app.js"></script>

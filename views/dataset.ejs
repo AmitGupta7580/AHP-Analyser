@@ -47,12 +47,12 @@
           <div class="dataset-bx" style="background-color: #69DAE0;">
             <h2 style="margin-top: 1.5vh;"> <%= data[i+j].hierarchy_name %> </h2>
             <p style="font-size: large;"> <%= data[i+j].level %> Levels<br> <%= data[i+j].alt_cnt %> Alternatives <br>Inconsistency : <%= data[i+j].inconsistency %>% </p>
-            <div class="dataset-expert-btn" onclick="window.location.assign('/experts?id=<%= data[i+j].author_id %>')">
+            <div class="dataset-expert-btn" onclick="window.location.assign('/experts/view?id=<%= data[i+j].author_id %>')">
               <i class="fas fa-user-tie"></i>&nbsp;&nbsp;<%= data[i+j].author %>
             </div>
             <div class="dataset-icons" id="<%= i+j %>">
               <button class="dataset-btn-hierarchy" onclick="window.location.assign('/hierarchy/view?id=<%= data[i+j].hierarchy_id %>')"><i class="fas fa-sitemap"></i></button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <button class="dataset-btn-data" onclick="window.location.assign('/dataset/view?id=<%= data[i+j]._id %>')"><i class="fas fa-chart-bar"></i></button>
+              <button class="dataset-btn-data" onclick="window.location.assign('/dataset/view?hierarchy_id=<%= data[i+j].hierarchy_id %>&auth_id=<%= data[i+j].author_id %>')"><i class="fas fa-chart-bar"></i></button>
             </div>
           </div>
         <% } %>
@@ -61,7 +61,14 @@
   </div>
 
   <div id="sk-bar" class="snackbar"></div>
+  <script>
+    var random_color = ['#69DAE0', 'rgb(255, 107, 70)', '#41F04A', '#FD57FD'];
 
+    var bx = document.getElementsByClassName('dataset-bx');
+    for(var i=0;i<bx.length; i++){
+      bx[i].setAttribute("style", "background-color: " + random_color[Math.floor(((i/4)+i)%4)]);
+    }
+  </script>
   <script src="/static/js/app.js"></script>
 </body>
 </html>

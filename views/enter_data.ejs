@@ -97,8 +97,9 @@
   <div id="sk-bar" class="snackbar"></div>
   <script src="/static/js/dataset.js"></script>
   <script>
-    var tabledata, flag=false, table, clicked_crt_id, filledCrt = [];
+    var tabledata, flag=false, table, clicked_crt_id, filledCrt = [], total_nodes=0;
     var crt = <%- JSON.stringify(crt) %>;
+    total_nodes = getTotalNodes(crt);
     var info = <%- JSON.stringify(info) %>;
     <% if(get) { %>
       flag = true;

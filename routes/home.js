@@ -10,12 +10,19 @@ const GlobalresultModel = mongoose.model('Globalresult');
 
 router.get("/home", (req, res) => {
   const sessionCookie = req.cookies.sessionID || "";
-  admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
-  .then((decodedClaims) => {
-    res.render("home.ejs",{loggedin: true});
-  })
-  .catch((error) => {
-    res.render("home.ejs",{loggedin: false});
+  GlobalresultModel.find((err, doc) => {
+    if(!err){
+      admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
+      .then((decodedClaims) => {
+        res.render("home.ejs",{loggedin: true, data: doc});
+      })
+      .catch((error) => {
+        res.render("home.ejs",{loggedin: false, data: doc});
+      });
+    }
+    else{
+      res.status(401).send("UNAUTHORIZED REQUEST!");
+    }
   });
 });
 
@@ -43,53 +50,6 @@ router.get("/home/view", (req, res) => {
   }
 });
 
-router.get("/home/expert/view", (req, res) => {
-  var flag = req.query.own;
-  var res_id = req.query.res_id;
-  if(!flag){
-    var doc_id = req.query.doc_id;
-  }
-  const sessionCookie = req.cookies.sessionID || "";
-  if(!flag && (doc_id === undefined || doc_id === "")){
-    console.log('here only');
-    res.redirect('/home');
-  }
-  else if(res_id === undefined || res_id === ""){
-    res.redirect('/home');
-  }
-  else{
-    admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
-    .then((decodedClaims) => {
-      if(!flag){
-        ResultModel.find({author: doc_id, hierarchy_id: res_id}).then((doc) => {
-          res.render("data_view.ejs",{loggedin: true, admin: false, data: doc[0]});
-        }).catch((err) => {
-          console.log(error.message);
-          res.redirect('/home');
-        });
-      }
-      else{
-        UserModel.find({'uuid': decodedClaims.uid}).then((d) => {
-          var doc_id = d[0]._id;
-          ResultModel.find({author: doc_id, hierarchy_id: res_id}).then((doc) => {
-            res.render("data_view.ejs",{loggedin: true, admin: false, data: doc[0]});
-          }).catch((err) => {
-            console.log(error.message);
-            res.redirect('/home');
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-          res.redirect('/home');
-        });
-      }
-    })
-    .catch((error) => {
-      console.log(error.message);
-      res.redirect('/home');
-    });
-  }
-});
 
 /* end-points of result section */
 router.post("/saveresult", (req, res) => {
@@ -101,13 +61,13 @@ router.post("/saveresult", (req, res) => {
   var hierarchy_id = req.body.hierarchy_id;
   var priority = req.body.priority;
   const sessionCookie = req.cookies.sessionID || "";
-  admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
+  admin.auth().verifySessionCookie(sessionCookie, true /* checkRevoked */)
   .then((decodedClaims) => {
-    UserModel.find({'uuid': decodedClaims.uid}).then((doc) => {
-      var doc_id = doc[0]._id;
-      var author = doc[0].username;
+    UserModel.find({'uuid': decodedClaims.uid}).then((document) => {
+      var doc_id = document[0]._id;
+      var author = document[0].username;
       // save or updating Result to database
-      ResultModel.find({'author': doc_id, 'hierarchy_id': hierarchy_id}).then((d) => {
+      ResultModel.find({'author_id': doc_id, 'hierarchy_id': hierarchy_id}).then((d) => {
         if(d[0] === undefined){
           // create new result and save it
           var Result = new ResultModel();
@@ -122,23 +82,160 @@ router.post("/saveresult", (req, res) => {
           Result.data = data;
           Result.save((e, doc) => {
             if(!e){
-              res.send('Result Saved');
+              console.log('result saved');
+              GlobalresultModel.find({hierarchy_id: hierarchy_id}).then((q) => {
+                if(q[0] === undefined){
+                  var Globalresult = new GlobalresultModel();
+                  Globalresult.hierarchy_id = hierarchy_id;
+                  Globalresult.hierarchy_name = hierarchy_name;
+                  Globalresult.level = level;
+                  Globalresult.alt_cnt = alt_cnt;
+                  Globalresult.inconsistency = [inconsistency.toFixed(4)*100];
+                  Globalresult.priority = priority;
+                  Globalresult.experts = [[author, doc_id]];
+                  Globalresult.save((p, l) => {
+                    if(!p){
+                      console.log('Global result Created');
+                      res.send('Result Saved');
+                    }
+                    else{
+                      console.log(p);
+                      res.status(401).send("UNAUTHORIZED REQUEST!");
+                    }
+                  });
+                }
+                else{
+                  res.send('Result Saved');
+                  // var exp = [author, doc_id];
+                  // var experts = q[0].experts;
+                  // var priority_init = q[0].priority;
+                  // var inconsistency_init = q[0].inconsistency;
+                  // var idx = experts.map(JSON.stringify).indexOf(JSON.stringify(exp));
+                  // if(idx == -1){
+                  //   // new entry
+                  //   experts.push(exp);
+                  //   priority_init = updatePriority(priority_init, priority);
+                  //   inconsistency_init.push(inconsistency.toFixed(4)*100);
+                  //   GlobalresultModel.updateOne(
+                  //     {hierarchy_id: hierarchy_id},
+                  //     {priority: priority_init, experts: experts, inconsistency: inconsistency_init}
+                  //   )
+                  //   .then((p) => {
+                  //     console.log('Global result Updated');
+                  //     res.send('Result Saved');
+                  //   })
+                  //   .catch((l) => {
+                  //     console.log(l);
+                  //     res.status(401).send("UNAUTHORIZED REQUEST!");
+                  //   });
+                  // }
+                  // else{
+                  //   // update previous entry
+                  //   priority_init = updatePriority(priority_init, priority);
+                  //   inconsistency_init[idx] = inconsistency.toFixed(4)*100;
+                  //   GlobalresultModel.updateOne(
+                  //     {hierarchy_id: hierarchy_id},
+                  //     {priority: priority_init, inconsistency: inconsistency_init}
+                  //   )
+                  //   .then((p) => {
+                  //     console.log('Global result Updated');
+                  //     res.send('Result Saved');
+                  //   })
+                  //   .catch((l) => {
+                  //     console.log(l);
+                  //     res.status(401).send("UNAUTHORIZED REQUEST!");
+                  //   });
+                  // }
+                }
+              })
+              .catch((w) => {
+                console.log(e);
+                res.status(401).send("UNAUTHORIZED REQUEST!");
+              });
             }
             else{
               console.log(e);
               res.status(401).send("UNAUTHORIZED REQUEST!");
             }
-          });
+          })
         }
         else{
           // update here
           ResultModel.updateOne(
-            {'author': doc_id, 'hierarchy_id': hierarchy_id},
-            {'priority': priority, 'data': data}
+            {'author_id': doc_id, 'hierarchy_id': hierarchy_id},
+            {'priority': priority, 'data': data, 'inconsistency': inconsistency.toFixed(4)*100}
           )
           .then((doc) => {
             console.log('Result Updated');
-            res.send('Result Updated');
+            GlobalresultModel.find({hierarchy_id: hierarchy_id}).then((q) => {
+              if(q[0] === undefined){
+                var Globalresult = new GlobalresultModel();
+                Globalresult.hierarchy_id = hierarchy_id;
+                Globalresult.hierarchy_name = hierarchy_name;
+                Globalresult.level = level;
+                Globalresult.alt_cnt = alt_cnt;
+                Globalresult.inconsistency = [inconsistency.toFixed(4)*100];
+                Globalresult.priority = priority;
+                Globalresult.experts = [[author, doc_id]];
+                Globalresult.save((p, l) => {
+                  if(!p){
+                    console.log('Global result Created');
+                    res.send('Result Saved');
+                  }
+                  else{
+                    console.log(p);
+                    res.status(401).send("UNAUTHORIZED REQUEST!");
+                  }
+                });
+              }
+              else{
+                res.send('Result Saved');
+                // var exp = [author, doc_id];
+                // var experts = q[0].experts;
+                // var priority_init = q[0].priority;
+                // var inconsistency_init = q[0].inconsistency;
+                // var idx = experts.map(JSON.stringify).indexOf(JSON.stringify(exp));
+                // if(idx == -1){
+                //   // new entry
+                //   experts.push(exp);
+                //   priority_init = updatePriority(priority_init, priority);
+                //   inconsistency_init.push(inconsistency.toFixed(4)*100);
+                //   GlobalresultModel.updateOne(
+                //     {hierarchy_id: hierarchy_id},
+                //     {priority: priority_init, experts: experts, inconsistency: inconsistency_init}
+                //   )
+                //   .then((p) => {
+                //     console.log('Global result Updated');
+                //     res.send('Result Saved');
+                //   })
+                //   .catch((l) => {
+                //     console.log(l);
+                //     res.status(401).send("UNAUTHORIZED REQUEST!");
+                //   });
+                // }
+                // else{
+                //   // update previous entry
+                //   priority_init = updatePriority(priority_init, priority);
+                //   inconsistency_init[idx] = inconsistency.toFixed(4)*100;
+                //   GlobalresultModel.updateOne(
+                //     {hierarchy_id: hierarchy_id},
+                //     {priority: priority_init, inconsistency: inconsistency_init}
+                //   )
+                //   .then((p) => {
+                //     console.log('Global result Updated');
+                //     res.send('Result Saved');
+                //   })
+                //   .catch((l) => {
+                //     console.log(l);
+                //     res.status(401).send("UNAUTHORIZED REQUEST!");
+                //   });
+                // }
+              }
+            })
+            .catch((w) => {
+              console.log(w);
+              res.status(401).send("UNAUTHORIZED REQUEST!");
+            });
           })
           .catch((e) => {
             console.log(e);
@@ -157,5 +254,11 @@ router.post("/saveresult", (req, res) => {
     res.status(401).send("UNAUTHORIZED REQUEST!");
   });
 });
+
+function updatePriority(p_ini, p) {
+  var x = [];
+
+  return x;
+}
 
 module.exports = router;

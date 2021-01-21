@@ -1,5 +1,17 @@
 /* ===========  Creating hierarchy and Alternative view ====================== */
 
+function getTotalNodes(crt){
+  if(crt.length>1){
+    var x = 1;
+    for(var i=0; i<crt[1].length; i++){
+      x += getTotalNodes(crt[1][i]);
+    }
+    return x;
+  }
+  else{
+    return 0;
+  }
+}
 function getEmptyCriterias(tab, id){
   if(tab[0] !== 'XXX'){
     filledCrt.push(id);
@@ -500,6 +512,8 @@ function solve(id, M, R){
 
 /* ======================   Function to save data to cloud ================ */
 function saveDataToCloud(){
+  filledCrt = [];
+  getEmptyCriterias(tabledata, '1');
   return fetch("/savedataset", {
     method: "POST",
     headers: {
@@ -507,7 +521,7 @@ function saveDataToCloud(){
       "Content-Type": "application/json",
       "CSRF-Token": Cookies.get("XSRF-TOKEN"),
     },
-    body: JSON.stringify({'tabledata': tabledata, 'hierarchy_id': id, 'flag': flag, 'inconsistency': max_incon}),
+    body: JSON.stringify({'tabledata': tabledata, 'hierarchy_id': id, 'flag': flag, 'inconsistency': max_incon, 'percentage': (filledCrt.length/total_nodes)*100, 'goal': goal}),
   })
   .then((response) => {
     if(response.status === 200 ){

@@ -60,7 +60,7 @@
         <ul id="alternative-body-list"></ul>
       </div>
       <div id="hierarchy-sv"><button id="hierarchy-cmpt-result-btn" onclick="viewResult()">View Result</button></div>
-      <div style="color: white; text-align: center; background-color: red; font-size: larger; margin-top: 1vh; margin-left: 4vw; margin-right: 4vw; cursor: pointer;" onclick="window.location.assign('/experts?id=<%= data.author_id %>')">
+      <div style="color: white; text-align: center; background-color: red; font-size: larger; margin-top: 1vh; margin-left: 4vw; margin-right: 4vw; cursor: pointer;" onclick="window.location.assign('/experts/view?id=<%= data.author_id %>')">
         <i class="fas fa-user-tie"></i>&nbsp;&nbsp;<%= data.author %>
       </div>
     </div>

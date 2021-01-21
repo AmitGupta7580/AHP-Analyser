@@ -37,11 +37,31 @@
     </div>
   </nav>
   <!-- main content -->
-  <div>
-    <h1>Home</h1>
+  <div id="home-background">
   </div>
+  <div id="home-main">
+    <% for(var i=0; i<data.length; i+=4){ %>
+      <div class="home-row" <% if(i==0) { %> style="margin-top: 0vh;" <% } %>>
+        <% for(var j=0; j<4&&(i+j)<data.length; j++) { %>
+          <div class="home-bx" style="background-color: #69DAE0;">
+            <h2 style="margin-top: 2vh;"><%= data[i+j].hierarchy_name %></h2>
+            <p style="font-size: large; margin-top: 3vh;"><%= data[i+j].level %> Levels<br><%= data[i+j].alt_cnt %> Alternatives<br> <%= data[i+j].experts.length %> Experts</p>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+
   <div id="sk-bar" class="snackbar"></div>
 
+  <script>
+    var random_color = ['#69DAE0', 'rgb(255, 107, 70)', '#41F04A', '#FD57FD'];
+
+    var bx = document.getElementsByClassName('home-bx');
+    for(var i=0;i<bx.length; i++){
+      bx[i].setAttribute("style", "background-color: " + random_color[Math.floor(((i/4)+i)%4)]);
+    }
+  </script>
   <script src="/static/js/app.js"></script>
 </body>
 </html>

@@ -7,7 +7,6 @@
   background-image: url(https://images.unsplash.com/photo-1553095066-5014bc7b7f2d?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8bGlnaHRpbmd8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&w=1000&q=80);
   background-repeat: no-repeat;
   background-size: 100vw 100vh;
-  color: white;
 }
 #dataset-main {
   overflow-y: auto;

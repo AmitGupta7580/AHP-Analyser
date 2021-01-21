@@ -69,11 +69,11 @@ router.get("/dataset/fill", (req, res) => {
           });
         })
         .catch((e) => {
-          console.log(error.message);
+          console.log(e.message);
           res.redirect('/dataset');
         })
       }).catch((err) => {
-        console.log(error.message);
+        console.log(err.message);
         res.redirect('/dataset');
       });
     })
@@ -85,15 +85,19 @@ router.get("/dataset/fill", (req, res) => {
 });
 
 router.get("/dataset/view", (req, res) => {
-  var res_id = req.query.id;
+  var aut_id = req.query.auth_id;
+  var hierarchy_id = req.query.hierarchy_id;
   const sessionCookie = req.cookies.sessionID || "";
-  if(res_id === undefined || res_id === ""){
+  if(hierarchy_id === undefined || hierarchy_id === ""){
+    res.redirect('/dataset');
+  }
+  else if(aut_id === undefined || aut_id === ""){
     res.redirect('/dataset');
   }
   else{
     admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
     .then((decodedClaims) => {
-      ResultModel.find({_id: res_id}).then((document) => {
+      ResultModel.find({'hierarchy_id': hierarchy_id, 'author_id': aut_id}).then((document) => {
         var data = document[0];
         var id = data.hierarchy_id;
         HierarchyModel.find({_id: id}).then((doc) => {
@@ -101,16 +105,16 @@ router.get("/dataset/view", (req, res) => {
             res.render("data_view.ejs",{loggedin: true, crt: doc[0].content, info: d[0], get: true, data: data});
           })
           .catch((e) => {
-            console.log(error.message);
+            console.log(e.message);
             res.redirect('/dataset');
           })
         }).catch((err) => {
-          console.log(error.message);
+          console.log(err.message);
           res.redirect('/dataset');
         });
       })
       .catch((err) => {
-        console.log(error.message);
+        console.log(err.message);
         res.redirect('/dataset');
       });
     })
@@ -123,6 +127,8 @@ router.get("/dataset/view", (req, res) => {
 
 /* end-points of dataset section */
 router.post("/savedataset", (req, res) => {
+  var goal = req.body.goal;
+  var percentage = req.body.percentage;
   var inconsistency = req.body.inconsistency;
   var tabledata = req.body.tabledata;
   var hierarchy_id = req.body.hierarchy_id;
@@ -132,36 +138,46 @@ router.post("/savedataset", (req, res) => {
   .then((decodedClaims) => {
     UserModel.find({'uuid': decodedClaims.uid}).then((doc) => {
       var author_name = doc[0].username;
+      var author_id = doc[0]._id;
       // save or updating Dataset to database
-      if(flag){
-        DatasetModel.update(
-          {'author': author_name, 'hierarchy_id': hierarchy_id},
-          {'content': tabledata, 'inconsistency': inconsistency}
-        )
-        .then((doc) => {
-          res.send('Dataset Updated');
-        })
-        .catch((e) => {
-          console.log(e);
-          res.status(401).send("UNAUTHORIZED REQUEST!");
-        });
-      }
-      else{
-        var Dataset = new DatasetModel();
-        Dataset.inconsistency = inconsistency;
-        Dataset.content = tabledata;
-        Dataset.author = author_name;
-        Dataset.hierarchy_id = hierarchy_id;
-        Dataset.save((e, doc) => {
-          if(!e){
-            res.send('Dataset Saved');
-          }
-          else{
+      DatasetModel.find({'author_id': author_id, 'hierarchy_id': hierarchy_id}).then((d) => {
+        if(d[0] !== undefined){
+          DatasetModel.update(
+            {'author_id': author_id, 'hierarchy_id': hierarchy_id},
+            {'content': tabledata, 'inconsistency': inconsistency, 'percentage': percentage}
+          )
+          .then((doc) => {
+            res.send('Dataset Updated');
+          })
+          .catch((e) => {
             console.log(e);
             res.status(401).send("UNAUTHORIZED REQUEST!");
-          }
-        });
-      }
+          });
+        }
+        else{
+          var Dataset = new DatasetModel();
+          Dataset.goal = goal;
+          Dataset.author_id = author_id;
+          Dataset.inconsistency = inconsistency;
+          Dataset.content = tabledata;
+          Dataset.author = author_name;
+          Dataset.hierarchy_id = hierarchy_id;
+          Dataset.percentage = percentage;
+          Dataset.save((e, doc) => {
+            if(!e){
+              res.send('Dataset Saved');
+            }
+            else{
+              console.log(e);
+              res.status(401).send("UNAUTHORIZED REQUEST!");
+            }
+          });
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+        res.status(401).send("UNAUTHORIZED REQUEST!");
+      });
     })
     .catch((err) => {
       console.log(err);

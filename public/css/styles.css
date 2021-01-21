@@ -155,3 +155,85 @@ ul {
   -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
   animation: fadein 0.5s, fadeout 0.5s 2.5s;
 }
+#home-background {
+  position: absolute;
+  z-index: -1;
+  height: 90vh;
+  width: 100vw;
+  background-image: url(https://i.pinimg.com/originals/45/30/cb/4530cbae0d4f7862dd51541af5d35082.jpg);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#home-main {
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 5vh;
+  height: 80vh;
+  width: 95vw;
+}
+.home-rw {
+  margin-top: 7vh;
+  display: inline-flex;
+  height: 35vh;
+  width: 95vw;
+}
+.home-bx {
+  padding-top: 2vh;
+  cursor: pointer;
+  margin-left: 5.7vw;
+  height: 35vh;
+  width: 17vw;
+  color: white;
+  opacity: 0.85;
+  text-align: center;
+}
+#profile-left {
+  border-top: 1vh solid red;
+  border-bottom: 1vh solid red;
+  text-align: center;
+  height: 77vh;
+  width: 25vw;
+  background-color: white;
+}
+#profile-right {
+  border-top: 1vh solid red;
+  border-bottom: 1vh solid red;
+  margin-left: 5vw;
+  height: 77vh;
+  width: 63vw;
+  text-align: center;
+  background-color: white;
+  overflow: hidden;
+}
+#profile-dataset-list {
+  margin-left: 1.5vw;
+  height: 61.9vh;
+  width: 60vw;
+  background-color: red;
+  overflow-y: auto;
+  overflow-x: hidden;
+  text-align: left;
+}
+.profile-list-item {
+  display: inline-flex;
+  margin-top: 1.5vh;
+  height: 7vh;
+  width: 54.6vw;
+  background-color: rgb(216, 216, 216);
+  border-radius: 8px;
+  font-size: x-large;
+  text-align: left;
+  padding-left: 2.4vw;
+  padding-top: 0.6vh;
+}
+.profile-show-btn {
+  margin-left: 1vw;
+  width: 3vw;
+  height: 6vh;
+  border: none;
+  border-radius: 50%;
+}
+.profile-dataset-progbar {
+  margin-top: 1.2vh;
+  width: 8vw;
+}
