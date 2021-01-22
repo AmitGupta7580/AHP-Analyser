@@ -17,8 +17,10 @@
   <link href="https://unpkg.com/tabulator-tables@4.9.3/dist/css/tabulator.min.css" rel="stylesheet">
   <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.9.3/dist/js/tabulator.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+  <link href="/static/css/login.css" rel="stylesheet" type="text/css">
   <link href="/static/css/styles.css" rel="stylesheet" type="text/css">
-  <link href="/static/css/hierarchy_admin.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/hierarchy.css" rel="stylesheet" type="text/css">
   <link href="/static/css/Treant.css" rel="stylesheet" type="text/css">
   <link href="/static/css/tree.css" rel="stylesheet" type="text/css">
 </head>
@@ -26,17 +28,16 @@
   <!-- top navigation bar -->
   <nav>
     <div id="nav-bar">
-      <div id="project-Heading"><h2><b>ADH-Analyser</b></h2></div>
+      <div id="project-Heading"><h2><b>ADH-Analyser</b></h2></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-1" href="/home"><i class="fas fa-home"></i>&nbsp;&nbsp;Home</a></div>
       <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-2" href="/hierarchy"><i class="fas fa-sitemap"></i>&nbsp;&nbsp;Hierarchy</a></div>
       <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-3" style="color: rgb(255, 172, 40);" href="/dataset"><i class="fas fa-database" style="color: rgb(255, 172, 40);"></i>&nbsp;&nbsp;Dataset</a></div>
-      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-4" href="/experts"><i class="fas fa-user-tie"></i>&nbsp;&nbsp;Experts</a></div>
-      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-5" href="/about"><i class="fas fa-info-circle"></i>&nbsp;&nbsp;About</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-5" href="/about"><i class="fas fa-info-circle"></i>&nbsp;&nbsp;About</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <% if(loggedin) { %>
         <div style="font-size: xx-large; margin-left: 16vw; color: rgb(170, 127, 59);"><a id="nav-tab-login" href="/profile"><i class="fas fa-user-circle"></i></a></div>
         <div style="font-size: x-large; margin-left: 3vw; color: rgb(170, 127, 59);"><button id="sign-out-btn" onclick="signout()"><i class="fas fa-sign-out-alt"></i></button></div>
       <% } else { %>
-        <script>window.location.assign('/dataset');</script>
+        <div style="font-size: large; margin-left: 20vw; color: rgb(170, 127, 59);"><a id="nav-tab-login" href="/login">Login&nbsp;&nbsp;<i class="fas fa-bars"></i></a></div>
       <% } %>
     </div>
   </nav>
@@ -107,7 +108,7 @@
       tabledata = <%- JSON.stringify(data.data) %>;
     <% } %>
     var id = window.location.search.split('=')[1];
-    var alt, con, lvl, leave_nodes=[], filledCrt = [], max_incon = 10;
+    var alt, con, lvl, leave_nodes=[], filledCrt = [];
     var randomIndex = [0, 0, 0.58, 0.9, 1.12, 1.24, 1.32, 1.41, 1.45, 1.49];
     var goal = info.goal;
     alt = info.alternatives;
@@ -117,7 +118,6 @@
     getEmptyCriterias(tabledata, '1');
     createAlternative(alt);
     createHierarchy(crt);
-    var con_check = true;
     var bgc = ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'];
     var bgb = ['rgba(255,99,132,1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'];
     var bgcolors = [], bgborder = [];

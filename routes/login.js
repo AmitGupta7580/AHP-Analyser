@@ -9,7 +9,14 @@ const request = require('request');
 var recaptcha_secret = "6LfCgB8aAAAAAKCoI9HfSMwc_IlhOyRaYQgaBU5y";
 
 router.get('/login/forget_password', function(req, res) {
-  res.render('forget_password.ejs');
+  const sessionCookie = req.cookies.sessionID || "";
+  admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
+  .then((decodedClaims) => {
+    res.redirect('/home');
+  })
+  .catch((error) => {
+    res.render('forget_password.ejs');
+  });
 });
 
 router.get('/login', function(req, res) {

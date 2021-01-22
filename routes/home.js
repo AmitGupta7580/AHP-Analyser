@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 const UserModel = mongoose.model('User');
 const ResultModel = mongoose.model('Result'); 
 const GlobalresultModel = mongoose.model('Globalresult');
+const HierarchyInfoModel = mongoose.model('HierarchyInfo');
+const HierarchyModel = mongoose.model('Hierarchy');
 
 router.get("/home", (req, res) => {
   const sessionCookie = req.cookies.sessionID || "";
@@ -21,7 +23,8 @@ router.get("/home", (req, res) => {
       });
     }
     else{
-      res.status(401).send("UNAUTHORIZED REQUEST!");
+      console.log(err);
+      res.status(500).send("Internal server error");
     }
   });
 });
@@ -35,21 +38,31 @@ router.get("/home/view", (req, res) => {
   else{
     admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
     .then((decodedClaims) => {
-      GlobalresultModel.find({hierarchy_id: res_id}).then((doc) => {
-        // res.render("data_view.ejs",{loggedin: true, admin: false, data: doc[0]});
-        res.send('page under construction');
+      GlobalresultModel.find({_id: res_id}).then((globalresult) => {
+        HierarchyInfoModel.find({hierarchy_id: globalresult[0].hierarchy_id}).then((hierarchyinfo) => {
+          HierarchyModel.find({_id: globalresult[0].hierarchy_id}).then((hierarchydata) => {
+            res.render("globalresult_view.ejs",{loggedin: true, res: globalresult[0], alt: hierarchyinfo[0].alternatives, crt: hierarchydata[0].content});
+          })
+          .catch((p) => {
+            console.log(p.message);
+            res.redirect('/home');
+          });
+        })
+        .catch((e) => {
+          console.log(e.message);
+          res.redirect('/home');
+        });
       }).catch((err) => {
-        console.log(error.message);
-        res.send('page under construction');
+        console.log(err.message);
+        res.redirect('/home');
       });
     })
     .catch((error) => {
       console.log(error.message);
-      res.send('page under construction');
+      res.redirect('/home');
     });
   }
 });
-
 
 /* end-points of result section */
 router.post("/saveresult", (req, res) => {

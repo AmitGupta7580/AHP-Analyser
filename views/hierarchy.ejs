@@ -17,18 +17,18 @@
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
   <link href="/static/css/styles.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/login.css" rel="stylesheet" type="text/css">
   <link href="/static/css/hierarchy.css" rel="stylesheet" type="text/css">
 </head>
 <body>
   <!-- top navigation bar -->
   <nav>
     <div id="nav-bar">
-      <div id="project-Heading"><h2><b>ADH-Analyser</b></h2></div>
+      <div id="project-Heading"><h2><b>ADH-Analyser</b></h2></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-1" href="/home"><i class="fas fa-home"></i>&nbsp;&nbsp;Home</a></div>
       <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-2" style="color: rgb(255, 172, 40);" href="/hierarchy"><i class="fas fa-sitemap" style="color: rgb(255, 172, 40);"></i>&nbsp;&nbsp;Hierarchy</a></div>
       <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-3" href="/dataset"><i class="fas fa-database"></i>&nbsp;&nbsp;Dataset</a></div>
-      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-4" href="/experts"><i class="fas fa-user-tie"></i>&nbsp;&nbsp;Experts</a></div>
-      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-5" href="/about"><i class="fas fa-info-circle"></i>&nbsp;&nbsp;About</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-5" href="/about"><i class="fas fa-info-circle"></i>&nbsp;&nbsp;About</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <% if(loggedin) { %>
         <div style="font-size: xx-large; margin-left: 16vw; color: rgb(170, 127, 59);"><a id="nav-tab-login" href="/profile"><i class="fas fa-user-circle"></i></a></div>
         <div style="font-size: x-large; margin-left: 3vw; color: rgb(170, 127, 59);"><button id="sign-out-btn" onclick="signout()"><i class="fas fa-sign-out-alt"></i></button></div>
@@ -40,7 +40,7 @@
   <!-- main content -->
   <% if(admin) { %>
     <div style="width: 100vw; height: 9vh; text-align: right; background-image: url(https://i.pinimg.com/originals/45/30/cb/4530cbae0d4f7862dd51541af5d35082.jpg);">
-      <button id="crt-hierarchy" onclick="createHierarchy()"><i class="fas fa-plus"></i>&nbsp;&nbsp;Create New Hierarchy</button>
+      <button id="crt-hierarchy" onclick="window.location.assign('/crthierarchy');"><i class="fas fa-plus"></i>&nbsp;&nbsp;Create New Hierarchy</button>
     </div>
     <div id="hierarchy-lst" style="height: 81vh;" >
   <% } else { %>
@@ -53,8 +53,8 @@
           <h2 style="margin-top: 2vh;"><%= data[i+j].goal %></h2>
           <p style="font-size: large; margin-top: 4vh;"><%= data[i+j].level %> Levels<br><%= data[i+j].alt_cnt %> Alternatives</p>
           <div class="hierarchy-icons" id="1">
-            <button class="hierarchy-btn-edit" id=<%= data[i+j].hierarchy_id %>><i class="far fa-edit"></i></button>
-            <button class="hierarchy-btn-view" id=<%= data[i+j].hierarchy_id %>><i class="far fa-eye"></i></button>
+            <button class="hierarchy-btn-edit" onclick="window.location.assign('/dataset/fill?id=<%= data[i+j].hierarchy_id %>')" id=<%= data[i+j].hierarchy_id %>><i class="far fa-edit"></i></button>
+            <button class="hierarchy-btn-view" onclick="window.location.assign('/hierarchy/view?id=<%= data[i+j].hierarchy_id %>')" id=<%= data[i+j].hierarchy_id %>><i class="far fa-eye"></i></button>
           </div>
         </div>
       <% } %>
@@ -64,6 +64,13 @@
   
   <div id="sk-bar" class="snackbar"></div>
 
+  <script>
+    var random_color = ['#69DAE0', 'rgb(255, 107, 70)', '#41F04A', '#FD57FD'];
+    var bx = document.getElementsByClassName('hierarchy-bx');
+    for(var i=0;i<bx.length; i++){
+      bx[i].setAttribute("style", "background-color: " + random_color[Math.floor(((i/4)+i)%4)]);
+    }
+  </script>
   <script src="/static/js/app.js"></script>
   <script src="/static/js/hierarchy.js"></script>
 </body>

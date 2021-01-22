@@ -521,7 +521,7 @@ function saveDataToCloud(){
       "Content-Type": "application/json",
       "CSRF-Token": Cookies.get("XSRF-TOKEN"),
     },
-    body: JSON.stringify({'tabledata': tabledata, 'hierarchy_id': id, 'flag': flag, 'inconsistency': max_incon, 'percentage': (filledCrt.length/total_nodes)*100, 'goal': goal}),
+    body: JSON.stringify({'tabledata': tabledata, 'hierarchy_id': id, 'inconsistency': max_incon, 'percentage': (filledCrt.length/total_nodes)*100, 'goal': goal}),
   })
   .then((response) => {
     if(response.status === 200 ){

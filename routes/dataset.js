@@ -13,26 +13,18 @@ router.get("/dataset", (req, res) => {
   const sessionCookie = req.cookies.sessionID || "";
   ResultModel.find((err, doc) => {
     if(!err){
-      var data = doc;
       admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
       .then((decodedClaims) => {
         admin.auth().getUser(decodedClaims.uid).then((userRecord) => {
-          if(userRecord.customClaims !== undefined){ // decodedClaims.admin
-            if(userRecord.customClaims['admin']){
-              res.render("dataset.ejs", {loggedin: true, expert: true, data: data});
-            }
-          }
-          else{
-            res.render("dataset.ejs", {loggedin: true, expert: false, data: data});
-          }
+          res.render("dataset.ejs", {loggedin: true, data: doc});
         });
       })
       .catch((error) => {
-        res.render("dataset.ejs", {loggedin: false, expert: false, data: data});
+        res.render("dataset.ejs", {loggedin: false, data: doc});
       });
     }
     else{
-      res.status(401).send("UNAUTHORIZED REQUEST!");
+      res.status(500).send("Internal server error");
     }
   });
 });
@@ -108,7 +100,8 @@ router.get("/dataset/view", (req, res) => {
             console.log(e.message);
             res.redirect('/dataset');
           })
-        }).catch((err) => {
+        })
+        .catch((err) => {
           console.log(err.message);
           res.redirect('/dataset');
         });
@@ -120,7 +113,7 @@ router.get("/dataset/view", (req, res) => {
     })
     .catch((error) => {
       console.log(error.message);
-      res.redirect('/dataset');
+      res.redirect('/login');
     });
   }
 });
@@ -132,7 +125,6 @@ router.post("/savedataset", (req, res) => {
   var inconsistency = req.body.inconsistency;
   var tabledata = req.body.tabledata;
   var hierarchy_id = req.body.hierarchy_id;
-  var flag = req.body.flag;
   const sessionCookie = req.cookies.sessionID || "";
   admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
   .then((decodedClaims) => {

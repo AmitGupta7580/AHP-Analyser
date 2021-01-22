@@ -18,17 +18,17 @@
 
   <link href="/static/css/styles.css" rel="stylesheet" type="text/css">
   <link href="/static/css/Dataset.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/login.css" rel="stylesheet" type="text/css">
 </head>
 <body>
   <!-- top navigation bar -->
   <nav>
     <div id="nav-bar">
-      <div id="project-Heading"><h2><b>ADH-Analyser</b></h2></div>
-      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-1" href="./home"><i class="fas fa-home"></i>&nbsp;&nbsp;Home</a></div>
-      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-2" href="./hierarchy"><i class="fas fa-sitemap"></i>&nbsp;&nbsp;Hierarchy</a></div>
-      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-3" style="color: rgb(255, 172, 40);" href="./dataset"><i class="fas fa-database" style="color: rgb(255, 172, 40);"></i>&nbsp;&nbsp;Dataset</a></div>
-      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-4" href="./experts"><i class="fas fa-user-tie"></i>&nbsp;&nbsp;Experts</a></div>
-      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-5" href="./about"><i class="fas fa-info-circle"></i>&nbsp;&nbsp;About</a></div>
+      <div id="project-Heading"><h2><b>ADH-Analyser</b></h2></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-1" href="/home"><i class="fas fa-home"></i>&nbsp;&nbsp;Home</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-2" href="/hierarchy"><i class="fas fa-sitemap"></i>&nbsp;&nbsp;Hierarchy</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-3" style="color: rgb(255, 172, 40);" href="/dataset"><i class="fas fa-database" style="color: rgb(255, 172, 40);"></i>&nbsp;&nbsp;Dataset</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-5" href="/about"><i class="fas fa-info-circle"></i>&nbsp;&nbsp;About</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <% if(loggedin) { %>
         <div style="font-size: xx-large; margin-left: 16vw; color: rgb(170, 127, 59);"><a id="nav-tab-login" href="/profile"><i class="fas fa-user-circle"></i></a></div>
         <div style="font-size: x-large; margin-left: 3vw; color: rgb(170, 127, 59);"><button id="sign-out-btn" onclick="signout()"><i class="fas fa-sign-out-alt"></i></button></div>

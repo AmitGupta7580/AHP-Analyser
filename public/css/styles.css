@@ -187,6 +187,9 @@ ul {
   opacity: 0.85;
   text-align: center;
 }
+.home-bx:hover {
+  opacity: 1;
+}
 #profile-left {
   border-top: 1vh solid red;
   border-bottom: 1vh solid red;

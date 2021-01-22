@@ -8,14 +8,15 @@ router.get("/about", (req, res) => {
   admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
   .then((decodedClaims) => {
     if(true){ // decodedClaims.expert
-      res.render("about.ejs", {loggedin: true, expert: true});
+      res.render("about.ejs", {loggedin: true});
     }
     else{
-      res.render("about.ejs", {loggedin: true, expert: false});
+      res.render("about.ejs", {loggedin: true});
     }
   })
   .catch((error) => {
-    res.render("about.ejs", {loggedin: false, expert: false});
+    console.log(error.message);
+    res.render("about.ejs", {loggedin: false});
   });
 });
 

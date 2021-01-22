@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global-Result</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+  <link href="/static/css/login.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/styles.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/hierarchy.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/Treant.css" rel="stylesheet" type="text/css">
+  <link href="/static/css/tree.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+  <!-- top navigation bar -->
+  <nav>
+    <div id="nav-bar">
+      <div id="project-Heading"><h2><b>ADH-Analyser</b></h2></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-1" style="color: rgb(255, 172, 40);" href="/home"><i class="fas fa-home" style="color: rgb(255, 172, 40);"></i>&nbsp;&nbsp;Home</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-2" href="/hierarchy"><i class="fas fa-sitemap"></i>&nbsp;&nbsp;Hierarchy</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-3" href="/dataset"><i class="fas fa-database"></i>&nbsp;&nbsp;Dataset</a></div>
+      <div style="font-size: large; margin-left: 4vw;"><a id="nav-tab-link-5" href="/about"><i class="fas fa-info-circle"></i>&nbsp;&nbsp;About</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <% if(loggedin) { %>
+        <div style="font-size: xx-large; margin-left: 16vw; color: rgb(170, 127, 59);"><a id="nav-tab-login" href="/profile"><i class="fas fa-user-circle"></i></a></div>
+        <div style="font-size: x-large; margin-left: 3vw; color: rgb(170, 127, 59);"><button id="sign-out-btn" onclick="signout()"><i class="fas fa-sign-out-alt"></i></button></div>
+      <% } else { %>
+        <div style="font-size: large; margin-left: 20vw; color: rgb(170, 127, 59);"><a id="nav-tab-login" href="/login">Login&nbsp;&nbsp;<i class="fas fa-bars"></i></a></div>
+      <% } %>
+    </div>
+  </nav>
+  <!-- main content -->
+  <span class="result">
+    <div style="display: inline-flex; height: 10vh;">
+      <div id="result-heading"><h2><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <%= res.hierarchy_name %> </b></h2></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <button id="result-body-tree-btn" onclick="showTreeView()"><i class="fas fa-sitemap"></i></button>
+      <button id="result-close-btn" onclick="window.location.assign('/home')"><i class="fas fa-times"></i></button>
+    </div>
+    <div style="display: inline-flex;">
+      <div id="result-container" style="width: 70vw; height: 70vh; margin: 5vw; margin-top: 5vh; margin-bottom: 0vh;">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div id="result-experts-list">
+        <ul>
+          <% for(var i=0;i<res.experts.length; i++) { %>
+            <li class="result-experts-list-item" onclick="window.location.assign('/dataset/view?hierarchy_id=<%= res.hierarchy_id %>&auth_id=<%= res.experts[i][1] %>')">
+              <%= res.experts[i][0] %>
+            </li>
+          <% } %>
+        </ul>
+      </div>
+    </div>
+  </span>
+  <span class="tree tree-toggle">
+    <div style="background-color: rgb(190, 243, 154); height: 82vh; width: 96vw; margin: 4vh; border-radius: 4vh; overflow: auto;">
+      <div style="position: fixed;">
+        <button id="tree-close-btn" onclick="closeTreeView()"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="tree-body"><div class="chart" id="Hierarchy-tree"></div></div>
+    </div>
+  </span>
+
+  <div id="sk-bar" class="snackbar"></div>
+  <script>
+    var priority = <%- JSON.stringify(res.priority) %>;
+    var alternatives = <%- JSON.stringify(alt) %>;
+    var crt = <%- JSON.stringify(crt) %>;
+    console.log(priority);
+    // var crt = JSON.stringify();
+    var id = window.location.search.split('=')[1];
+    var bgc = ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'];
+    var bgb = ['rgba(255,99,132,1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'];
+    var bgcolors = [], bgborder = [];
+    for(var i=0; i<<%= res.alt_cnt %>; i++){
+      bgcolors.push(bgc[i%5]);
+      bgborder.push(bgb[i%5]);
+    }
+    var barChartData = {
+      labels: alternatives,
+      datasets: [{
+        data: priority,
+        backgroundColor: bgcolors,
+        borderColor: bgborder,
+        borderWidth: 1
+      }]
+    };
+    var ctx = document.getElementById('canvas').getContext('2d');
+    var mybar = new Chart(ctx, {
+      type: 'bar',
+      data: barChartData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero:true
+            }
+          }]
+        }
+      }
+    });
+    function showTreeView() {
+      document.querySelector('.result').classList.toggle("tree-toggle");
+      document.querySelector('.tree').classList.toggle("tree-toggle");
+      var chart_config = [];
+      var config = {
+        container: "#Hierarchy-tree",
+        nodeAlign: "BOTTOM",
+        connectors: {
+          type: 'step'
+        }
+      }
+      var root = {
+        text: {
+          name: crt[0]
+        }
+      }
+      chart_config.push(config);
+      chart_config.push(root);
+      createTreeView(root, crt[1], chart_config);
+      new Treant( chart_config );
+    }
+    function createTreeView(parent, crt, ans) {
+      var i;
+      for( i=0; i<crt.length; i++){
+        var val = crt[i][0];
+        var node = {
+          parent: parent,
+          innerHTML: val
+        };
+        ans.push(node);
+        createTreeView(node, crt[i][1], ans);
+      }
+    }
+    function closeTreeView() {
+      document.querySelector('.result').classList.toggle("tree-toggle");
+      document.querySelector('.tree').classList.toggle("tree-toggle");
+    }
+  </script>
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/raphael.js"></script>
+  <script src="/static/js/Treant.js"></script>
+</body>
+</html>
