@@ -6,22 +6,6 @@ const mongoose = require('mongoose');
 const UserModel = mongoose.model('User');
 const DatasetModel = mongoose.model('Dataset');
 
-router.get("/experts", (req, res) => {
-  const sessionCookie = req.cookies.sessionID || "";
-  admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
-  .then((decodedClaims) => {
-    if(true){ // decodedClaims.expert
-      res.render("experts.ejs", {loggedin: true, expert: true});
-    }
-    else{
-      res.render("experts.ejs", {loggedin: true, expert: false});
-    }
-  })
-  .catch((error) => {
-    res.render("experts.ejs", {loggedin: false, expert: false});
-  });
-});
-
 router.get("/experts/view", (req, res) => {
   var id = req.query.id;
   var isAdmin = false;
