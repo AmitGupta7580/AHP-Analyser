@@ -99,6 +99,7 @@ router.post("/saveresult", (req, res) => {
               GlobalresultModel.find({hierarchy_id: hierarchy_id}).then((q) => {
                 if(q[0] === undefined){
                   var Globalresult = new GlobalresultModel();
+                  Globalresult.datasets = [data];
                   Globalresult.hierarchy_id = hierarchy_id;
                   Globalresult.hierarchy_name = hierarchy_name;
                   Globalresult.level = level;
@@ -118,47 +119,60 @@ router.post("/saveresult", (req, res) => {
                   });
                 }
                 else{
-                  res.send('Result Saved');
-                  // var exp = [author, doc_id];
-                  // var experts = q[0].experts;
-                  // var priority_init = q[0].priority;
-                  // var inconsistency_init = q[0].inconsistency;
-                  // var idx = experts.map(JSON.stringify).indexOf(JSON.stringify(exp));
-                  // if(idx == -1){
-                  //   // new entry
-                  //   experts.push(exp);
-                  //   priority_init = updatePriority(priority_init, priority);
-                  //   inconsistency_init.push(inconsistency.toFixed(4)*100);
-                  //   GlobalresultModel.updateOne(
-                  //     {hierarchy_id: hierarchy_id},
-                  //     {priority: priority_init, experts: experts, inconsistency: inconsistency_init}
-                  //   )
-                  //   .then((p) => {
-                  //     console.log('Global result Updated');
-                  //     res.send('Result Saved');
-                  //   })
-                  //   .catch((l) => {
-                  //     console.log(l);
-                  //     res.status(401).send("UNAUTHORIZED REQUEST!");
-                  //   });
-                  // }
-                  // else{
-                  //   // update previous entry
-                  //   priority_init = updatePriority(priority_init, priority);
-                  //   inconsistency_init[idx] = inconsistency.toFixed(4)*100;
-                  //   GlobalresultModel.updateOne(
-                  //     {hierarchy_id: hierarchy_id},
-                  //     {priority: priority_init, inconsistency: inconsistency_init}
-                  //   )
-                  //   .then((p) => {
-                  //     console.log('Global result Updated');
-                  //     res.send('Result Saved');
-                  //   })
-                  //   .catch((l) => {
-                  //     console.log(l);
-                  //     res.status(401).send("UNAUTHORIZED REQUEST!");
-                  //   });
-                  // }
+                  var dataset = [data];
+                  var datasets = q[0].datasets;
+                  var exp = [author, doc_id];
+                  var experts = q[0].experts;
+                  var priority_init = [];
+                  var inconsistency_init = q[0].inconsistency;
+                  for(var i=0;i<alt_cnt; i++){
+                    priority_init.push(0);
+                  }
+                  var idx = experts.map(JSON.stringify).indexOf(JSON.stringify(exp));
+                  if(idx == -1){
+                    // new entry
+                    experts.push(exp);
+                    datasets.push(dataset);
+                    var x = calculateNewData(datasets, datasets.length);
+                    calculatePriority(x, priority_init, 1);
+                    for(var i=0;i<priority_init.length; i++){
+                      priority_init[i] = priority_init[i].toFixed(4)*100
+                    }
+                    inconsistency_init.push(inconsistency.toFixed(4)*100);
+                    GlobalresultModel.updateOne(
+                      {hierarchy_id: hierarchy_id},
+                      {datasets: datasets, priority: priority_init, experts: experts, inconsistency: inconsistency_init}
+                    )
+                    .then((p) => {
+                      console.log('Global result Updated');
+                      res.send('Result Saved');
+                    })
+                    .catch((l) => {
+                      console.log(l);
+                      res.status(401).send("UNAUTHORIZED REQUEST!");
+                    });
+                  }
+                  else{
+                    // update previous entry
+                    var x = calculateNewData(datasets, datasets.length);
+                    calculatePriority(x, priority_init, 1);
+                    for(var i=0;i<priority_init.length; i++){
+                      priority_init[i] = priority_init[i].toFixed(4)*100
+                    }
+                    inconsistency_init[idx] = inconsistency.toFixed(4)*100;
+                    GlobalresultModel.updateOne(
+                      {hierarchy_id: hierarchy_id},
+                      {datasets: datasets, priority: priority_init, inconsistency: inconsistency_init}
+                    )
+                    .then((p) => {
+                      console.log('Global result Updated');
+                      res.send('Result Saved');
+                    })
+                    .catch((l) => {
+                      console.log(l);
+                      res.status(401).send("UNAUTHORIZED REQUEST!");
+                    });
+                  }
                 }
               })
               .catch((w) => {
@@ -183,6 +197,7 @@ router.post("/saveresult", (req, res) => {
             GlobalresultModel.find({hierarchy_id: hierarchy_id}).then((q) => {
               if(q[0] === undefined){
                 var Globalresult = new GlobalresultModel();
+                Globalresult.datasets = [data];
                 Globalresult.hierarchy_id = hierarchy_id;
                 Globalresult.hierarchy_name = hierarchy_name;
                 Globalresult.level = level;
@@ -202,47 +217,60 @@ router.post("/saveresult", (req, res) => {
                 });
               }
               else{
-                res.send('Result Saved');
-                // var exp = [author, doc_id];
-                // var experts = q[0].experts;
-                // var priority_init = q[0].priority;
-                // var inconsistency_init = q[0].inconsistency;
-                // var idx = experts.map(JSON.stringify).indexOf(JSON.stringify(exp));
-                // if(idx == -1){
-                //   // new entry
-                //   experts.push(exp);
-                //   priority_init = updatePriority(priority_init, priority);
-                //   inconsistency_init.push(inconsistency.toFixed(4)*100);
-                //   GlobalresultModel.updateOne(
-                //     {hierarchy_id: hierarchy_id},
-                //     {priority: priority_init, experts: experts, inconsistency: inconsistency_init}
-                //   )
-                //   .then((p) => {
-                //     console.log('Global result Updated');
-                //     res.send('Result Saved');
-                //   })
-                //   .catch((l) => {
-                //     console.log(l);
-                //     res.status(401).send("UNAUTHORIZED REQUEST!");
-                //   });
-                // }
-                // else{
-                //   // update previous entry
-                //   priority_init = updatePriority(priority_init, priority);
-                //   inconsistency_init[idx] = inconsistency.toFixed(4)*100;
-                //   GlobalresultModel.updateOne(
-                //     {hierarchy_id: hierarchy_id},
-                //     {priority: priority_init, inconsistency: inconsistency_init}
-                //   )
-                //   .then((p) => {
-                //     console.log('Global result Updated');
-                //     res.send('Result Saved');
-                //   })
-                //   .catch((l) => {
-                //     console.log(l);
-                //     res.status(401).send("UNAUTHORIZED REQUEST!");
-                //   });
-                // }
+                var dataset = [data];
+                var datasets = q[0].datasets;
+                var exp = [author, doc_id];
+                var experts = q[0].experts;
+                var priority_init = [];
+                var inconsistency_init = q[0].inconsistency;
+                for(var i=0;i<alt_cnt; i++){
+                  priority_init.push(0);
+                }
+                var idx = experts.map(JSON.stringify).indexOf(JSON.stringify(exp));
+                if(idx == -1){
+                  // new entry
+                  experts.push(exp);
+                  datasets.push(dataset);
+                  var x = calculateNewData(datasets, datasets.length);
+                  calculatePriority(x, priority_init, 1);
+                  for(var i=0;i<priority_init.length; i++){
+                    priority_init[i] = priority_init[i].toFixed(4)*100
+                  }
+                  inconsistency_init.push(inconsistency.toFixed(4)*100);
+                  GlobalresultModel.updateOne(
+                    {hierarchy_id: hierarchy_id},
+                    {datasets: datasets, priority: priority_init, experts: experts, inconsistency: inconsistency_init}
+                  )
+                  .then((p) => {
+                    console.log('Global result Updated');
+                    res.send('Result Saved');
+                  })
+                  .catch((l) => {
+                    console.log(l);
+                    res.status(401).send("UNAUTHORIZED REQUEST!");
+                  });
+                }
+                else{
+                  // update previous entry
+                  var x = calculateNewData(datasets, datasets.length);
+                  calculatePriority(x, priority_init, 1);
+                  for(var i=0;i<priority_init.length; i++){
+                    priority_init[i] = priority_init[i].toFixed(4)*100
+                  }
+                  inconsistency_init[idx] = inconsistency.toFixed(4)*100;
+                  GlobalresultModel.updateOne(
+                    {hierarchy_id: hierarchy_id},
+                    {datasets: datasets, priority: priority_init, inconsistency: inconsistency_init}
+                  )
+                  .then((p) => {
+                    console.log('Global result Updated');
+                    res.send('Result Saved');
+                  })
+                  .catch((l) => {
+                    console.log(l);
+                    res.status(401).send("UNAUTHORIZED REQUEST!");
+                  });
+                }
               }
             })
             .catch((w) => {
@@ -268,10 +296,78 @@ router.post("/saveresult", (req, res) => {
   });
 });
 
-function updatePriority(p_ini, p) {
-  var x = [];
-
-  return x;
+function calculateNewData(data, n) {
+  if(data[0][0] !== undefined){
+    var mat = [];
+    for(var j=0;j<data[0][0].length; j++){
+      var x = [];
+      for(var k=0;k<data[0][0][0].length; k++){
+        x.push(1);
+      }
+      mat.push(x);
+    }
+    for(var j=0;j<data[0][0].length; j++){
+      for(var k=0;k<data[0][0][0].length; k++){
+        for(var i=0;i<n;i++){
+          if(data[i][0][j][k].length > 1){
+            var y = data[i][0][j][k].split('/');
+            mat[j][k] *= Number(y[0])/Number(y[1]);
+          }
+          else{
+            mat[j][k] *= Number(data[i][0][j][k]);
+          }
+        }
+        mat[j][k] = Math.pow(mat[j][k], 1/n);
+      }
+    }
+    var ans = [mat];
+    var ch = [];
+    for(var i=0;i<data[0][1].length; i++){
+      var newdata = [];
+      for(var j=0;j<n;j++){
+        newdata.push(data[j][1][i]);
+      }
+      ch.push(calculateNewData(newdata, n));
+    }
+    ans.push(ch);
+    return ans;
+  }
+}
+function calculatePriority(data, p, x) {
+  console.log(data[1]);
+  var sum = [], weights = [];
+  for(var i=0;i<data[0].length; i++){
+    sum.push(0);
+    weights.push(0);
+  }
+  for(var i=0;i<data[0].length; i++){
+    for(var j=0;j<data[0][0].length; j++){
+      sum[j] += data[0][i][j];
+    }
+  }
+  for(var i=0;i<data[0].length; i++){
+    for(var j=0;j<data[0][0].length; j++){
+      weights[i] += data[0][i][j]/sum[j];
+    }
+  }
+  for(var i=0;i<data[0].length; i++){
+    weights[i] /= data[0].length;
+    console.log(weights[i]);
+    weights[i] *= x;
+  }
+  if(data[1].length === 0){
+    console.log('leave node');
+    for(var i=0;i<p.length; i++){
+      p[i] += weights[i];
+    }
+    // leave node
+  }
+  else{
+    for(var i=0;i<data[1].length; i++){
+      console.log(i);
+      calculatePriority(data[1][i], p, weights[i]);
+    }
+  }
 }
 
 module.exports = router;

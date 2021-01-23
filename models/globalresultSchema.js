@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 var GlobalresultSchema = new mongoose.Schema({
+    datasets: Array,
     experts: Array,
     priority: Array,
     level: Number,
