@@ -24,7 +24,7 @@
 }
 .dataset-bx {
   margin-left: 5.7vw;
-  height: 35vh;
+  height: 38vh;
   width: 17vw;
   color: white;
   opacity: 0.85;
@@ -37,6 +37,7 @@
   cursor: pointer;
   background-color: red;
   margin: 2vh;
+  margin-top: 0vh;
   width: auto;
   font-size: larger;
 }

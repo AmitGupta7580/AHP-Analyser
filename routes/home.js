@@ -66,6 +66,7 @@ router.get("/home/view", (req, res) => {
 
 /* end-points of result section */
 router.post("/saveresult", (req, res) => {
+  console.log("request for save result");
   var level = req.body.level;
   var alt_cnt = req.body.alt_cnt;
   var inconsistency = req.body.inconsistency;
@@ -119,7 +120,7 @@ router.post("/saveresult", (req, res) => {
                   });
                 }
                 else{
-                  var dataset = [data];
+                  var dataset = data;
                   var datasets = q[0].datasets;
                   var exp = [author, doc_id];
                   var experts = q[0].experts;
@@ -129,10 +130,11 @@ router.post("/saveresult", (req, res) => {
                     priority_init.push(0);
                   }
                   var idx = experts.map(JSON.stringify).indexOf(JSON.stringify(exp));
-                  if(idx == -1){
+                  if(idx === -1){
                     // new entry
                     experts.push(exp);
                     datasets.push(dataset);
+                    displayData(datasets, datasets.length);
                     var x = calculateNewData(datasets, datasets.length);
                     calculatePriority(x, priority_init, 1);
                     for(var i=0;i<priority_init.length; i++){
@@ -217,7 +219,7 @@ router.post("/saveresult", (req, res) => {
                 });
               }
               else{
-                var dataset = [data];
+                var dataset = data;
                 var datasets = q[0].datasets;
                 var exp = [author, doc_id];
                 var experts = q[0].experts;
@@ -227,7 +229,7 @@ router.post("/saveresult", (req, res) => {
                   priority_init.push(0);
                 }
                 var idx = experts.map(JSON.stringify).indexOf(JSON.stringify(exp));
-                if(idx == -1){
+                if(idx === -1){
                   // new entry
                   experts.push(exp);
                   datasets.push(dataset);
@@ -334,7 +336,6 @@ function calculateNewData(data, n) {
   }
 }
 function calculatePriority(data, p, x) {
-  console.log(data[1]);
   var sum = [], weights = [];
   for(var i=0;i<data[0].length; i++){
     sum.push(0);
@@ -352,11 +353,9 @@ function calculatePriority(data, p, x) {
   }
   for(var i=0;i<data[0].length; i++){
     weights[i] /= data[0].length;
-    console.log(weights[i]);
     weights[i] *= x;
   }
   if(data[1].length === 0){
-    console.log('leave node');
     for(var i=0;i<p.length; i++){
       p[i] += weights[i];
     }
@@ -364,7 +363,6 @@ function calculatePriority(data, p, x) {
   }
   else{
     for(var i=0;i<data[1].length; i++){
-      console.log(i);
       calculatePriority(data[1][i], p, weights[i]);
     }
   }

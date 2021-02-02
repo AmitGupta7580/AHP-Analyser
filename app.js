@@ -9,7 +9,7 @@ const csrfMiddleware = csrf({ cookie: true });
 
 const connection = require('./models');
 
-const PORT = 3000
+const PORT = 80
 
 //Requiring Routes.
 const loginRouter = require('./routes/login')

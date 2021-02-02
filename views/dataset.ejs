@@ -45,8 +45,8 @@
       <div class="dataset-rw" <% if(i==0) { %> style="margin-top: 0vh;" <% } %> >
         <% for(var j=0; j<4&&(i+j)<data.length; j++) { %>
           <div class="dataset-bx" style="background-color: #69DAE0;">
-            <h2 style="margin-top: 1.5vh;"> <%= data[i+j].hierarchy_name %> </h2>
-            <p style="font-size: large;"> <%= data[i+j].level %> Levels<br> <%= data[i+j].alt_cnt %> Alternatives <br>Inconsistency : <%= data[i+j].inconsistency %>% </p>
+            <h3 style="margin-top: 1.5vh;"> <%= data[i+j].hierarchy_name %> </h3>
+            <p style="font-size: 15px; margin-top: 0vh;"> <%= data[i+j].level %> Levels<br> <%= data[i+j].alt_cnt %> Alternatives <br>Inconsistency : <%= data[i+j].inconsistency %>% </p>
             <div class="dataset-expert-btn" onclick="window.location.assign('/experts/view?id=<%= data[i+j].author_id %>')">
               <i class="fas fa-user-tie"></i>&nbsp;&nbsp;<%= data[i+j].author %>
             </div>

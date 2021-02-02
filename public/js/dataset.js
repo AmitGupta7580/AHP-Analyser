@@ -547,13 +547,16 @@ function saveDataToCloud(){
 
 /* =============   Mathematical Part of Project calculating Weights and consistency  ========== */
 // require variables for cumputing result (priorities)
-// tabledata, leave_nodes, getTableDataById
+// tabledata
 function computeResult() {
   if(checkAllTablesAreFill(tabledata)){
     if(max_incon <= con){
       // calculating priorities
-      priority = calculatePriority();
-      console.log(priority);
+      priority = [];
+      for(var i=0;i<alt.length; i++){
+        priority.push(0);
+      }
+      calculatePriority(getProcessedData(tabledata), priority, 1);
       if(priority !== []){
         saveDataToCloud().then(() => {
           // saving result
@@ -608,66 +611,63 @@ function computeResult() {
     showSnackbar();
   }
 }
-function calculatePriority(){
-  var leave_nodes_weights = [];
-  var alt_priority = [];
-  var priority = [];
-  for(var i=0; i<leave_nodes.length; i++){
-    leave_nodes_weights.push(calculateLeaveNodeWeight(leave_nodes[i]));
-    alt_priority.push(calculateWeights(getTableDataById(tabledata, leave_nodes[i])));
+function calculatePriority(data, p, x){
+  var sum = [], weights = [];
+  for(var i=0;i<data[0].length; i++){
+    sum.push(0);
+    weights.push(0);
   }
-  var sum = 0;
-  for(var i=0; i< leave_nodes_weights.length; i++){
-    sum += leave_nodes_weights[i];
+  for(var i=0;i<data[0].length; i++){
+    for(var j=0;j<data[0][0].length; j++){
+      sum[j] += data[0][i][j];
+    }
   }
-  if(sum !== 1){
-    console.log('some glitch happen');
+  for(var i=0;i<data[0].length; i++){
+    for(var j=0;j<data[0][0].length; j++){
+      weights[i] += data[0][i][j]/sum[j];
+    }
+  }
+  for(var i=0;i<data[0].length; i++){
+    weights[i] /= data[0].length;
+    console.log(weights[i]);
+    weights[i] *= x;
+  }
+  if(data[1].length === 0){
+    console.log('leave node');
+    for(var i=0;i<p.length; i++){
+      p[i] += weights[i];
+    }
   }
   else{
-    // getting best alternative
-    for(var i=0; i<leave_nodes_weights.length; i++){
-      for(var j=0; j<alt.length; j++){
-        alt_priority[i][j] *= leave_nodes_weights[i];
-      }
+    for(var i=0;i<data[1].length; i++){
+      console.log(i);
+      calculatePriority(data[1][i], p, weights[i]);
     }
-    for(var i=0; i<alt.length; i++){
-      priority.push(0);
-    }
-    for(var i=0; i<leave_nodes_weights.length; i++){
-      for(var j=0; j<alt.length; j++){
-        priority[j] += alt_priority[i][j];
-      }
-    }
-    var x=0;
-    for(var i=0; i<priority.length; i++){
-      x += priority[i];
-    }
-    if(x === 1){
-      console.log('Resulte is computed successfully');
-    }
-  }
-  return priority;
-}
-function calculateLeaveNodeWeight(id){
-  if(id.length === 3){
-    return calculateWeights(getTableDataById(tabledata, id.split('-')[0]))[id.split('-')[1]];
-  }
-  else{
-    return (calculateLeaveNodeWeight(id.slice(0, id.length-2)))*calculateWeights(getTableDataById(tabledata, id.slice(0, id.length-2)))[id[id.length-1]];
   }
 }
-function calculate(data) {
-  var w = [];
-  w.push(calculateWeights(data[0]));
+function getProcessedData(data){
+  var newdata = [];
+  var x = []
+  for(var i=0; i<data[0].length; i++){
+    var p = []
+    for(var j=0; j<data[0][i].length; j++){
+      if(data[0][i][j].length > 1){
+        var y = data[0][i][j].split('/');
+        p.push(Number(y[0])/Number(y[1]));
+      }
+      else{
+        p.push(Number(data[0][i][j]));
+      }
+    }
+    x.push(p);
+  }
+  newdata.push(x);
   var ch = [];
-  if(!checkConsistency(data[0], w[0])){
-    con_check = false;
+  for(var i=0;i<data[1].length; i++){
+    ch.push(getProcessedData(data[1][i]));
   }
-  for(var i=0; i<data[1].length; i++){
-    ch.push(calculate(data[1][i]));
-  }
-  w.push(ch);
-  return w;
+  newdata.push(ch);
+  return newdata;
 }
 function calculateWeights(M) {
   var n = M.length, weights = [], sum = [];
