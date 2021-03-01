@@ -102,8 +102,22 @@
         maintainAspectRatio: false,
         scales: {
           yAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'Priority Percentage',
+              fontColor: '#ff0000',
+              fontSize: 15
+            },
             ticks: {
               beginAtZero:true
+            }
+          }],
+          xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'Alternatives',
+              fontColor: '#ff0000',
+              fontSize: 15
             }
           }]
         }

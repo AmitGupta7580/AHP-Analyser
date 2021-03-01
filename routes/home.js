@@ -10,6 +10,25 @@ const GlobalresultModel = mongoose.model('Globalresult');
 const HierarchyInfoModel = mongoose.model('HierarchyInfo');
 const HierarchyModel = mongoose.model('Hierarchy');
 
+router.get("/", (req, res) => {
+  const sessionCookie = req.cookies.sessionID || "";
+  GlobalresultModel.find((err, doc) => {
+    if(!err){
+      admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
+      .then((decodedClaims) => {
+        res.render("home.ejs",{loggedin: true, data: doc});
+      })
+      .catch((error) => {
+        res.render("home.ejs",{loggedin: false, data: doc});
+      });
+    }
+    else{
+      console.log(err);
+      res.status(500).send("Internal server error");
+    }
+  });
+});
+
 router.get("/home", (req, res) => {
   const sessionCookie = req.cookies.sessionID || "";
   GlobalresultModel.find((err, doc) => {
