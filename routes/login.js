@@ -6,7 +6,7 @@ const UserModel = mongoose.model('User');
 var router = express.Router();
 const request = require('request');
 
-var recaptcha_secret = "6LfCgB8aAAAAAKCoI9HfSMwc_IlhOyRaYQgaBU5y";
+var recaptcha_secret = "<SECRET KEY>";
 
 router.get('/login/forget_password', function(req, res) {
   const sessionCookie = req.cookies.sessionID || "";
